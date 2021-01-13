@@ -32,5 +32,8 @@ CREATE VIEW klienci_na_dzien as select zwroc_date(data_id) as data , count(klien
 /*Łączny koszt kursow*/
 CREATE VIEW pelen_kosz_kursow as select sum(cena_za_calosc) as caly_koszt from kurs;
 
+/*Przychod na dzien*/
+CREATE VIEW przychody as select zwroc_date(d.data_id) as dzien, zysk_na_dzien(data_id) from data d;
 
-/*DOPISAC ZYSK NA DZIEN - FUNCKJE*/
+/*Wypisanie seansow w kursach*/
+CREATE VIEW seanse_w_kursach as select k.nazwa as nazwa_kursu, zwroc_seansy_w_kursie(k.kurs_id) as nazwa_seansow from kurs k; 

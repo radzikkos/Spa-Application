@@ -1,13 +1,14 @@
 CREATE TABLE cena_rzeczy(
-    cena_id INTEGER NOT NULL,
-    cena_pojedynczej_sztuki FLOAT NOT NULL DEFAULT 1,
+    cena_id SERIAL,
+    -- cena_id INTEGER NOT NULL,
+    cena_pojedynczej_sztuki FLOAT NOT NULL UNIQUE,
     CONSTRAINT cena_rzeczy_pk PRIMARY KEY (cena_id)
 );
 
 CREATE TABLE rzecz(
     rzecz_id SERIAL,
     cena_id INTEGER NOT NULL,
-    nazwa VARCHAR NOT NULL,
+    nazwa VARCHAR NOT NULL UNIQUE,
     ilosc INTEGER,
     CONSTRAINT rzecz_pk PRIMARY KEY (rzecz_id),
     CONSTRAINT cena_id_fk FOREIGN KEY(cena_id) REFERENCES cena_rzeczy(cena_id) ON DELETE CASCADE
@@ -157,6 +158,23 @@ $$ --zamkniecie bloku programu
 LANGUAGE plpgsql;  -- deklaracja języka
 ----------------------------------------
 
+/*Zwrot id ceny po cenie */
+CREATE OR REPLACE FUNCTION zwroc_id_ceny(int4) RETURNS int4 AS
+$$        -- otwarcie bloku programu
+DECLARE   -- blok deklaracji
+    cena_id_ integer := 0;
+    cena ALIAS FOR $1; -- alias argumentów
+BEGIN
+    select into cena_id_ c.cena_id from cena_rzeczy c where c.cena_pojedynczej_sztuki = cena;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'BRAK TAKIEJ CENY';
+    END IF;
+    return cena_id_;
+END;
+$$ --zamkniecie bloku programu
+LANGUAGE plpgsql;  -- deklaracja języka
+
+----------------------------------------
 /*Funckcja zwracajaca cene produktow wykorzystanych w seansie*/
 CREATE OR REPLACE FUNCTION zwroc_cene_seansu(int4) RETURNS int4 AS
 $$        -- otwarcie bloku programu
@@ -233,6 +251,42 @@ DECLARE
     
 BEGIN 
     select into nazwa_ k.nazwa from kurs k where k.kurs_id = kurs_id_;
+    
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO KURSU';
+    END IF;
+    return nazwa_;
+END;
+$$ 
+LANGUAGE plpgsql;  
+
+/*Funckja zwracajaca kurs_id po nazwie*/
+CREATE OR REPLACE FUNCTION zwroc_kurs_id(VARCHAR) RETURNS int4 AS
+$$       
+DECLARE   
+    kurs_nazwa_ ALIAS FOR $1;
+    id integer := 0;
+    
+BEGIN 
+    
+    select into id k.kurs_id from kurs k where k.nazwa = kurs_nazwa_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO KURSU';
+    END IF;
+    return id;
+END;
+$$ 
+LANGUAGE plpgsql; 
+
+/*Funckja zwracajaca nazwe seansu po seans_id*/
+CREATE OR REPLACE FUNCTION zwroc_nazwe_seansu(int4) RETURNS VARCHAR AS
+$$       
+DECLARE   
+    seans_id_ ALIAS FOR $1;
+    nazwa_ VARCHAR := 'NULL';
+    
+BEGIN 
+    select into nazwa_ k.rodzaj from seans k where k.seans_id = seans_id_;
     
     if  NOT FOUND THEN
         RAISE EXCEPTION 'BRAK TAKIEGO KURSU';
@@ -327,4 +381,222 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
+/*Przychody na dzien po data_id*/
+CREATE OR REPLACE FUNCTION zysk_na_dzien(int4) RETURNS  int4 AS
+$$       
+DECLARE   
+    data_ ALIAS FOR $1;
+    zysk integer := 0;
+    temp_zysk integer := 0;
+    wiersz RECORD;
+BEGIN 
+    for wiersz in (select k.kurs_id from klient_kurs k where k.data_id = data_)
+    loop
+        select into temp_zysk k.cena_za_calosc from kurs k where k.kurs_id = wiersz.kurs_id;
+        zysk := zysk + temp_zysk;
+    end loop;
+    return zysk;
+END;
+$$ 
+LANGUAGE plpgsql;
 
+/*Wypisanie seansow w kursie po kurs_id*/
+CREATE OR REPLACE FUNCTION zwroc_seansy_w_kursie(int4) RETURNS  TABLE(nazwa_seansu VARCHAR) AS
+$$       
+DECLARE   
+    kurs_id_ ALIAS FOR $1;
+    wiersz RECORD;
+BEGIN 
+    return QUERY
+    select zwroc_nazwe_seansu(ks.seans_id) from kurs_seans ks where ks.kurs_id = kurs_id_;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+/*Trigger dla klientow sprawdzajacy poprawnosc danych*/
+CREATE OR REPLACE FUNCTION valid_klient ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+    IF LENGTH(NEW.pesel) <> 11 THEN
+        RAISE EXCEPTION 'Niepoprawny pesel';
+    END IF;
+    IF LENGTH(NEW.imie) = 0 THEN
+        RAISE EXCEPTION 'Niepoprawne imie';
+    END IF;
+    IF LENGTH(NEW.nazwisko) = 0 THEN
+        RAISE EXCEPTION 'Niepoprawne nazwisko';
+    END IF;
+    NEW.imie = lower(NEW.imie);
+    NEW.imie = initcap(NEW.imie);
+    NEW.nazwisko = lower(NEW.nazwisko);
+    NEW.nazwisko = initcap(NEW.nazwisko);
+    RETURN NEW;                                                          
+    END;
+    $$;
+
+CREATE TRIGGER klient_valid 
+    BEFORE INSERT OR UPDATE  ON klient
+    FOR EACH ROW EXECUTE PROCEDURE valid_klient();  
+
+/*Trigger dla daty*/
+CREATE OR REPLACE FUNCTION valid_data ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if NEW.data NOT LIKE '__-__-____' then
+          RAISE EXCEPTION 'Niepoprawna data';
+        end if;       
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER data_valid 
+    BEFORE INSERT OR UPDATE  ON data
+    FOR EACH ROW EXECUTE PROCEDURE valid_data();  
+
+/*Trigger dla kursu sprawdzajacy poprawnosc danych*/
+CREATE OR REPLACE FUNCTION valid_kurs ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if LENGTH(NEW.nazwa) = 0 then
+          RAISE EXCEPTION 'Niepoprawna nazwa kursu';
+        end if;    
+        if NEW.poziom_luksusu < 0 or NEW.poziom_luksusu > 5 then
+          RAISE EXCEPTION 'Poziom luksusu moze byc od 0 do 5';
+        end if;    
+        NEW.nazwa = lower(NEW.nazwa);
+        return NEW;                                           
+    END;
+    $$;
+
+
+CREATE TRIGGER kurs_valid 
+    BEFORE INSERT OR UPDATE  ON kurs
+    FOR EACH ROW EXECUTE PROCEDURE valid_kurs();  
+
+/*Trigger dla seansu sprawdzajacy poprawnosc danych*/
+CREATE OR REPLACE FUNCTION valid_seans ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if LENGTH(NEW.rodzaj) = 0 then
+          RAISE EXCEPTION 'Niepoprawna nazwa seansu';
+        end if;    
+        if NEW.czas_trwania < 0 or NEW.czas_trwania > 100 then
+          RAISE EXCEPTION 'Czas trwania moze byc od 0 do 100';
+        end if;    
+        NEW.rodzaj = lower(NEW.rodzaj);
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER seans_valid 
+    BEFORE INSERT OR UPDATE  ON seans
+    FOR EACH ROW EXECUTE PROCEDURE valid_seans();  
+
+/*Trigger dla rzeczy wykorzystanych do seansu*/
+CREATE OR REPLACE FUNCTION valid_rwds ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if NEW.uzyta_ilosc < 0 or NEW.uzyta_ilosc > 100 then
+          RAISE EXCEPTION 'Uzysta ilosc przedmiotow moze byc od 0 do 100';
+        end if;    
+       
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER rwds_valid 
+    BEFORE INSERT OR UPDATE  ON rzeczy_wykorzystane_do_seansu
+    FOR EACH ROW EXECUTE PROCEDURE valid_rwds();  
+
+/*Trigger dla rzeczy */
+CREATE OR REPLACE FUNCTION valid_rzecz ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if LENGTH(NEW.nazwa) = 0 then
+          RAISE EXCEPTION 'Niepoprawna nazwa rzeczy';
+        end if;    
+        if NEW.ilosc < 0 then
+            RAISE EXCEPTION 'Za mala ilosc rzeczy';
+        end if;
+        NEW.nazwa = lower(NEW.nazwa);
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER rzecz_valid 
+    BEFORE INSERT OR UPDATE  ON rzecz
+    FOR EACH ROW EXECUTE PROCEDURE valid_rzecz();  
+
+/*Trigger dla ceny rzeczy */
+CREATE OR REPLACE FUNCTION valid_cena_rzecz ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if NEW.cena_pojedynczej_sztuki <= 0 then
+          RAISE EXCEPTION 'Niepoprawna cena';
+        end if;    
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER valid_cena_rzecz 
+    BEFORE INSERT OR UPDATE  ON cena_rzeczy
+    FOR EACH ROW EXECUTE PROCEDURE valid_cena_rzecz();  
+
+/*Trigger dla pracownika */
+CREATE OR REPLACE FUNCTION valid_pracownik ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if LENGTH(NEW.imie) = 0 then
+          RAISE EXCEPTION 'Niepoprawne imie pracownika';
+        end if;    
+        if LENGTH(NEW.nazwisko) = 0 then
+          RAISE EXCEPTION 'Niepoprawne nazwisko pracownika';
+        end if; 
+        if LENGTH(NEW.stanowisko) = 0 then
+          RAISE EXCEPTION 'Niepoprawne stanowisko pracownika';
+        end if; 
+        NEW.imie = lower(NEW.imie);
+        NEW.imie = initcap(NEW.imie);
+        NEW.nazwisko = lower(NEW.nazwisko);
+        NEW.nazwisko = initcap(NEW.nazwisko);
+        NEW.stanowisko = lower(NEW.stanowisko);
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER valid_pracownik
+    BEFORE INSERT OR UPDATE  ON pracownik
+    FOR EACH ROW EXECUTE PROCEDURE valid_pracownik();  
+
+/*Trigger dla wyngarodzenia */
+CREATE OR REPLACE FUNCTION valid_wynagrodzenie ()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        if NEW.kwota <= 0 then
+          RAISE EXCEPTION 'Niepoprawna kwota';
+        end if;    
+        return NEW;                                           
+    END;
+    $$;
+
+CREATE TRIGGER valid_wynagrodzenie
+    BEFORE INSERT OR UPDATE  ON wynagrodzenie
+    FOR EACH ROW EXECUTE PROCEDURE valid_wynagrodzenie();  

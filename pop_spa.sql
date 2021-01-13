@@ -1,25 +1,28 @@
-INSERT INTO cena_rzeczy VALUES (1,1); 
-INSERT INTO cena_rzeczy VALUES (2,2); 
+INSERT INTO cena_rzeczy(cena_pojedynczej_sztuki) VALUES (4); 
+INSERT INTO cena_rzeczy(cena_pojedynczej_sztuki) VALUES (2); 
 
-INSERT INTO rzecz VALUES (1,1,'czekolada',10); 
-INSERT INTO rzecz VALUES (2,2,'olejek kokosowy',100); 
+INSERT INTO rzecz(cena_id, nazwa, ilosc) VALUES (1,'czekolada',10); 
+INSERT INTO rzecz(cena_id, nazwa, ilosc) VALUES (2,'olejek kokosowy',100); 
+INSERT INTO rzecz(cena_id, nazwa, ilosc) VALUES (zwroc_id_ceny(4),'olejek bambusowy',100); 
+
 
 INSERT INTO pomieszczenie VALUES (1); 
 INSERT INTO pomieszczenie VALUES (2); 
 
-INSERT INTO seans VALUES (1,1,'masaż tajski', 45); 
-INSERT INTO seans VALUES (2,1,'masaż gorącymi kamieniami', 45); 
-INSERT INTO seans VALUES (3,2,'masaż czekoladą', 45); 
-INSERT INTO seans VALUES (4,2,'masaż eukaliptusem', 45); 
-INSERT INTO seans VALUES (5,2,'bicze wodne', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (1,'masaż tajski', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (1,'masaż gorącymi kamieniami', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'masaż czekoladą', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'masaż eukaliptusem', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'bicze wodne', 45); 
+INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'sauna finska', 20); 
 
 INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (1,1,5);
-INSERT INTO rzeczy_wykorzystane_do_seansu VALUES (1,2,10);
-INSERT INTO rzeczy_wykorzystane_do_seansu VALUES (2,2,4);
+INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (1,2,10);
+INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (2,2,4);
 
-INSERT INTO wynagrodzenie VALUES (1,1000);
-INSERT INTO wynagrodzenie VALUES (2,2000);
-INSERT INTO wynagrodzenie VALUES (3,3000);
+INSERT INTO wynagrodzenie(kwota) VALUES (1000);
+INSERT INTO wynagrodzenie(kwota) VALUES (2000);
+INSERT INTO wynagrodzenie(kwota) VALUES (3000);
 
 INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (1,1,'Roman', 'Konopka', 'masażysta');
 INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (2,3,'Adam', 'Nowak', 'masażysta');
@@ -29,6 +32,7 @@ INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VA
 
 INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('brazylijskie jambo', 1);
 INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('wicher poranka', 2);
+INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('meksykanskie bueno', 3);
 
 INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,1,1);
 INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,2,2);
@@ -39,19 +43,21 @@ INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,1,1);
 INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,4,1);
 INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,3,2);
 
-INSERT INTO data(data) VALUES ('1-1-2020');
-INSERT INTO data(data) VALUES ('2-1-2020');
-INSERT INTO data(data) VALUES ('3-1-2020');
-INSERT INTO data(data) VALUES ('4-1-2020');
-INSERT INTO data(data) VALUES ('5-1-2020');
-INSERT INTO data(data) VALUES ('6-1-2020');
-INSERT INTO data(data) VALUES ('7-1-2020');
-INSERT INTO data(data) VALUES ('8-1-2020');
-INSERT INTO data(data) VALUES ('9-1-2020');
+INSERT INTO data(data) VALUES ('01-01-2020');
+INSERT INTO data(data) VALUES ('02-01-2020');
+INSERT INTO data(data) VALUES ('03-01-2020');
+INSERT INTO data(data) VALUES ('04-01-2020');
+INSERT INTO data(data) VALUES ('05-01-2020');
+INSERT INTO data(data) VALUES ('06-01-2020');
+INSERT INTO data(data) VALUES ('07-01-2020');
+INSERT INTO data(data) VALUES ('08-01-2020');
+INSERT INTO data(data) VALUES ('09-01-2020');
+INSERT INTO data(data) VALUES ('10-01-2020');
 
 INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Jan', 'Kowalski', '12345678901');
 INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Dorota', 'Cynk', '12345678902');
 INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Benjamin', 'Cynk', '12345678903');
+INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Beata', 'BAT', '12345678904');
 
 
 INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (1,1,1);
@@ -73,3 +79,5 @@ drop table seans CASCADE;
 drop table pomieszczenie CASCADE;
 drop table wynagrodzenie CASCADE;
 drop table kurs CASCADE;
+drop table klient_kurs cascade;
+drop table klient cascade;
