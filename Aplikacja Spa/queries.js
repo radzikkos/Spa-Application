@@ -10,6 +10,7 @@ const pool = new Pool({
     /* 
     CRUD for items
     */
+    /**Dopisac do triggerze, ze nie moze byc dwoch klientow o tym samym imieniu i nazwisku */
 const getItems = (request, response) => {
     pool.query('SELECT * FROM rzeczy_cena', (error, results) => {
         if (error) {
@@ -385,6 +386,7 @@ const getCoursesAndSeances = (request, response) => {
         response.status(200).json(results.rows)
     })
 }
+
 const getCourseAndSeancesByCourseName = (request, response) => {
     const name = request.params.name
     pool.query('SELECT * from seanse_w_kursach where kurs = $1', [name], (error, results) => {
@@ -405,7 +407,111 @@ const createCourseAndSeance = (request, response) => {
     })
 }
 
+const updateCourseAndSeance = (request, response) => {
+    const course_name = request.params.course_name
+    const seance_name = request.params.seance_name
+    const { name, surname, workstand, salary } = request.body[0]
 
+    pool.query('UPDATE kurs_seans set pracownik_id = zwroc_id_pracownika($3, $4, $5,$6) where (kurs_id = zwroc_kurs_id($1)) and (seans_id = zwroc_id_seansu($2)) ', [course_name, seance_name, name, surname, workstand, salary], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna zmodyfikowac kursu`)
+        }
+        response.status(200).send(`Pracownik zmieniony zmieniony`)
+    })
+}
+
+const deleteCourseAndSeance = (request, response) => {
+    const course_name = request.params.course_name
+    const seance_name = request.params.seance_name
+    pool.query('DELETE FROM kurs_seans WHERE kurs_id = zwroc_kurs_id($1) and seans_id = zwroc_id_seansu($2)', [course_name, seance_name], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna usunac tego kursu`)
+        }
+        response.status(200).send(`Seans z kursu usuniety`)
+    })
+}
+
+/**
+ * CRUD for data
+ */
+const getData = (request, response) => {
+        pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
+            if (error) {
+                return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
+            }
+            response.status(200).json(results.rows)
+        })
+    }
+    /*Nwm czy potrzeba getDataById */
+    /*Tak samo z updatem */
+
+const deleteData = (request, response) => {
+    const data = request.params.data
+    pool.query('DELETE FROM data WHERE data = $1', [data], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna usunac tego kursu`)
+        }
+        response.status(200).send(`Data usunieta`)
+    })
+}
+
+/**
+ * CRUD for clients
+ */
+
+const getClients = (request, response) => {
+    pool.query('SELECT * from klient', (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac klientow`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+const getClientByNameAndSurname = (request, response) => {
+    const name = request.params.name
+    const surname = request.params.surname
+    pool.query('SELECT zwroc_dane_klienta($1, $2) as klient_kursy', [name, surname], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac klientow`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+const createClient = (request, response) => {
+        const { name, surname, pesel } = request.body[0]
+        pool.query('INSERT INTO klient(imie, nazwisko, pesel) VALUES ($1, $2, $3)', [name, surname, pesel], (error, results) => {
+            if (error) {
+                return response.status(400).send('Nie mozna dodac klienta do kursu')
+            }
+            response.status(201).send(`Klient dodany`)
+        })
+    }
+    /*Klientowi nie mozna updetowac danych */
+const deleteClient = (request, response) => {
+    const name = request.params.name
+    const surname = request.params.surname
+    pool.query('DELETE FROM klient WHERE imie = $1 and nazwisko = $2', [name, surname], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna usunac tego klienta`)
+        }
+        response.status(200).send(`Klient usuniety`)
+    })
+}
+
+/**
+ * CRUD for client and course - associate table
+ */
+
+const getClientsAndCourses = (request, response) => {
+    pool.query('SELECT * from klient_kurs_widok', (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac klientKurs`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
 
 module.exports = {
     /*Items */
@@ -460,5 +566,20 @@ module.exports = {
     getCoursesAndSeances,
     getCourseAndSeancesByCourseName,
     createCourseAndSeance,
+    updateCourseAndSeance,
+    deleteCourseAndSeance,
+
+    /*Datas */
+    getData,
+    deleteData,
+
+    /*Clients */
+    getClients,
+    getClientByNameAndSurname,
+    createClient,
+    deleteClient,
+
+    /*ClientsAndCourse */
+    getClientsAndCourses,
 
 }

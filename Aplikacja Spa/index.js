@@ -31,6 +31,10 @@ app.get('/courses', db.getCourses)
 app.get('/courses/:name', db.getCourseByName)
 app.get('/coursesAndSeances', db.getCoursesAndSeances)
 app.get('/coursesAndSeances/:name', db.getCourseAndSeancesByCourseName)
+app.get('/data', db.getData)
+app.get('/clients', db.getClients)
+app.get('/clients/:name/:surname', db.getClientByNameAndSurname)
+app.get('/clientsAndCourses', db.getClientsAndCourses)
 
 app.post('/items', db.createItem)
 app.post('/prices', db.createPrice)
@@ -41,6 +45,7 @@ app.post('/salaries', db.createSalary)
 app.post('/employees', db.createEmployee)
 app.post('/courses', db.createCourse)
 app.post('/coursesAndSeances', db.createCourseAndSeance)
+app.post('/clients', db.createClient)
 
 
 app.put('/items/:name', db.updateItem)
@@ -49,6 +54,7 @@ app.put('/itemUsedInSeance/:seance_name/:item_name', db.updateItemUsedInSeance)
 app.put('/salaries/:previous_salary', db.updateSalary)
 app.put('/employees/:name/:surname/:workstand/:salary', db.updateEmployee)
 app.put('/courses/:name', db.updateCourse)
+app.put('/coursesAndSeances/:course_name/:seance_name', db.updateCourseAndSeance)
 
 app.delete('/items/:name', db.deleteItem)
 app.delete('/prices/:price', db.deletePrice)
@@ -58,6 +64,9 @@ app.delete('/itemUsedInSeance/:seance_name/:item_name', db.deleteItemUsedInSeanc
 app.delete('/salaries/:salary', db.deleteSalary)
 app.delete('/employees/:name/:surname/:workstand/:salary', db.deleteEmployee)
 app.delete('/courses/:name', db.deleteCourse)
+app.delete('/coursesAndSeances/:course_name/:seance_name', db.deleteCourseAndSeance)
+app.delete('/data/:data', db.deleteData)
+app.delete('/clients/:name/:surname', db.deleteClient)
 
 
 app.use((req, res, next) => {
