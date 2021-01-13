@@ -93,7 +93,7 @@ const deletePrice = (request, response) => {
 const getRooms = (request, response) => {
     pool.query('SELECT pomieszczenie_id as nr_pokoju FROM pomieszczenie ORDER BY pomieszczenie_id DESC;', (error, results) => {
         if (error) {
-            return response.status(200).send(`Nie mozna wypisac pomieszczen`)
+            return response.status(400).send(`Nie mozna wypisac pomieszczen`)
         }
         response.status(200).json(results.rows)
     })
@@ -122,6 +122,50 @@ const deleteRoom = (request, response) => {
 /**
  * CRUD for seances
  */
+const getSeances = (request, response) => {
+    pool.query('SELECT * from seans', (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac seansu`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+const createSeance = (request, response) => {
+    const { room, type, time } = request.body[0]
+    pool.query('INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES ($1, $2, $3)', [room, type, time], (error, results) => {
+        if (error) {
+            return response.status(400).send('Nie mozna dodac seansu')
+        }
+        response.status(201).send(`Seans zostal dodany`)
+    })
+}
+
+const updateSeance = (request, response) => {
+    const type = request.params.type
+    const { time } = request.body[0]
+
+    pool.query('UPDATE seans SET  czas_trwania = $1 WHERE rodzaj = $2', [time, type], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna zmodyfikowac sensu`)
+        }
+        response.status(200).send(`Seans ${type} zostal zmodyfikowany`)
+    })
+}
+
+const deleteSeance = (request, response) => {
+    const type = request.params.type
+    pool.query('DELETE FROM seans WHERE rodzaj = $1', [type], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna usunac tego seansu`)
+        }
+        response.status(200).send(`Seans ${type} zostal usuniety`)
+    })
+}
+
+
+
+
 
 module.exports = {
     /*Items */
@@ -139,4 +183,10 @@ module.exports = {
     getRooms,
     createRoom,
     deleteRoom,
+
+    /*Seances */
+    getSeances,
+    createSeance,
+    updateSeance,
+    deleteSeance,
 }

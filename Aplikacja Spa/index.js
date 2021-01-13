@@ -22,16 +22,20 @@ app.get('/', (req, res) => {
 app.get('/items', db.getItems)
 app.get('/prices', db.getPrices)
 app.get('/rooms', db.getRooms)
+app.get('/seances', db.getSeances)
 
 app.post('/items', db.createItem)
 app.post('/prices', db.createPrice)
 app.post('/rooms', db.createRoom)
+app.post('/seances', db.createSeance)
 
 app.put('/items/:name', db.updateItem)
+app.put('/seances/:type', db.updateSeance)
 
 app.delete('/items/:name', db.deleteItem)
 app.delete('/prices/:price', db.deletePrice)
 app.delete('/rooms/:nr', db.deleteRoom)
+app.delete('/seances/:type', db.deleteSeance)
 
 app.use((req, res, next) => {
     res.status(404).send({
