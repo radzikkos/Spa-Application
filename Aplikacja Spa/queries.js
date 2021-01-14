@@ -9,8 +9,7 @@ const pool = new Pool({
     /*Napisac get sb by ID */
     /* 
     CRUD for items
-    */
-    /**Dopisac do triggerze, ze nie moze byc dwoch klientow o tym samym imieniu i nazwisku */
+*/
 const getItems = (request, response) => {
     pool.query('SELECT * FROM rzeczy_cena', (error, results) => {
         if (error) {
@@ -124,7 +123,6 @@ const deleteRoom = (request, response) => {
  * CRUD for seances
  */
 const getSeances = (request, response) => {
-    //pool.query('SELECT * from seans', (error, results) => {
     pool.query('SELECT * from widok_seansu', (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wypisac seansu`)
@@ -132,6 +130,17 @@ const getSeances = (request, response) => {
         response.status(200).json(results.rows)
     })
 }
+const getSeanceByName = (request, response) => {
+    const name = request.params.name
+    pool.query('SELECT nazwa, uzyta_ilosc from rzeczy_w_seansie_widok where seans_id = zwroc_id_seansu($1)', [name], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac seansu`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+
 
 const createSeance = (request, response) => {
     const { room, type, time } = request.body[0]
@@ -169,7 +178,7 @@ const deleteSeance = (request, response) => {
  * CRUD for item used in seance -associate table
  */
 const getItemUsedInSeance = (request, response) => {
-    pool.query('SELECT * from rzeczy_w_seansie_widok', (error, results) => {
+    pool.query('SELECT nazwa,rodzaj,uzyta_ilosc from rzeczy_w_seansie_widok', (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wypisac rzeczy w seansie`)
         }
@@ -333,7 +342,7 @@ const getCourses = (request, response) => {
 const getCourseByName = (request, response) => {
     const name = request.params.name
 
-    pool.query('SELECT * from kurs_widok where nazwa = $1 ', [name], (error, results) => {
+    pool.query('SELECT seans from seanse_w_kursach where kurs_id = zwroc_kurs_id($1) ', [name], (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wyszukac kursu`)
         } else {
@@ -379,7 +388,7 @@ const deleteCourse = (request, response) => {
 CRUD for course and seance - associate table
  */
 const getCoursesAndSeances = (request, response) => {
-    pool.query('SELECT * from kurs_seans_widok', (error, results) => {
+    pool.query('SELECT * from kurs_seans_widok ORDER BY kurs', (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
         }
@@ -401,7 +410,7 @@ const createCourseAndSeance = (request, response) => {
     const { course_name, seance_name, name, surname, workstand, salary } = request.body[0]
     pool.query('INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id($1),zwroc_id_seansu($2),zwroc_id_pracownika($3, $4, $5,$6));', [course_name, seance_name, name, surname, workstand, salary], (error, results) => {
         if (error) {
-            return response.status(400).send('Nie mozna dodac tego seansu do kursu')
+            return response.status(400).send('Pracownik pracuje za dlugo lub klientow jest wiecej niz 10 lub brakuje jakiejs rzeczy')
         }
         response.status(201).send(`Seansu do kursu dodany`)
     })
@@ -435,9 +444,19 @@ const deleteCourseAndSeance = (request, response) => {
  * CRUD for data
  */
 const getData = (request, response) => {
-        pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
+    pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+const getDataByData = (request, response) => {
+        const data = request.params.data
+        pool.query(' select k.imie, k.nazwisko from klient k where k.klient_id IN (select zwroc_klientow_w_danym_dniu(zwroc_data_id($1)))', [data], (error, results) => {
             if (error) {
-                return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
+                throw error
+                return response.status(400).send(`Nie mozna wypisac klientow w tym dniu`)
             }
             response.status(200).json(results.rows)
         })
@@ -505,13 +524,52 @@ const deleteClient = (request, response) => {
  */
 
 const getClientsAndCourses = (request, response) => {
-    pool.query('SELECT * from klient_kurs_widok', (error, results) => {
+    pool.query('SELECT * from klient_kurs_widok ORDER BY data DESC', (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wypisac klientKurs`)
         }
         response.status(200).json(results.rows)
     })
 }
+
+const createClientAndCourse = (request, response) => {
+    const { name, surname, course_name, data } = request.body[0]
+    pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id($1, $2),zwroc_kurs_id($3),zwroc_data_id($4))', [name, surname, course_name, data], (error, results) => {
+        if (error) {
+            return response.status(400).send('Nie mozna dodac klienta do kursu')
+        }
+        response.status(201).send(`Klient zapisany na kurs`)
+    })
+}
+
+const updateClientAndCourse = (request, response) => {
+    const name = request.params.name
+    const surname = request.params.surname
+    const data = request.params.data
+
+    const { course } = request.body[0]
+
+    pool.query('UPDATE klient_kurs set kurs_id = zwroc_kurs_id($1) where (klient_id = zwroc_klient_id($2,$3)) and (data_id = zwroc_data_id($4)) ', [course, name, surname, data], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna zmodyfikowac klient kurs`)
+        }
+        response.status(200).send(`Kurs w danym dniu dla klienta zostal zmieniony`)
+    })
+}
+
+const deleteClientAndCourse = (request, response) => {
+    const name = request.params.name
+    const surname = request.params.surname
+    const data = request.params.data
+
+    pool.query('DELETE FROM klient_kurs WHERE (klient_id = zwroc_klient_id($1,$2)) and (data_id = zwroc_data_id($3))', [name, surname, data], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna usunac tego zamowienia`)
+        }
+        response.status(200).send(`Zamowienie usuniete`)
+    })
+}
+
 
 module.exports = {
     /*Items */
@@ -532,6 +590,7 @@ module.exports = {
 
     /*Seances */
     getSeances,
+    getSeanceByName,
     createSeance,
     updateSeance,
     deleteSeance,
@@ -571,6 +630,7 @@ module.exports = {
 
     /*Datas */
     getData,
+    getDataByData,
     deleteData,
 
     /*Clients */
@@ -581,5 +641,8 @@ module.exports = {
 
     /*ClientsAndCourse */
     getClientsAndCourses,
+    createClientAndCourse,
+    updateClientAndCourse,
+    deleteClientAndCourse,
 
 }

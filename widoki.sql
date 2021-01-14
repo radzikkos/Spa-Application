@@ -36,4 +36,18 @@ CREATE VIEW pelen_kosz_kursow as select sum(cena_za_calosc) as caly_koszt from k
 CREATE VIEW przychody as select zwroc_date(d.data_id) as dzien, zysk_na_dzien(data_id) from data d;
 
 /*Wypisanie seansow w kursach*/
-CREATE VIEW seanse_w_kursach as select k.nazwa as nazwa_kursu, zwroc_seansy_w_kursie(k.kurs_id) as nazwa_seansow from kurs k; 
+CREATE VIEW seanse_w_kursach as select k.kurs_id, k.nazwa as kurs, zwroc_seansy_w_kursie(k.kurs_id) as seans from kurs k; 
+
+/*Rzeczy w seansie*/
+CREATE VIEW rzeczy_w_seansie_widok as select r.seans_id, (select rr.nazwa from rzecz rr where rr.rzecz_id = r.rzecz_id), (select s.rodzaj from seans s where s.seans_id = r.seans_id), r.uzyta_ilosc from rzeczy_wykorzystane_do_seansu r;
+
+/*Widok kursu bez kurs id*/
+CREATE VIEW kurs_widok as select k.nazwa, k.poziom_luksusu, k.cena_za_calosc from kurs k;
+
+/*Widok dla sensu i kursu, by pokazywac po nazwach*/
+CREATE VIEW kurs_seans_widok  as select zwroc_nazwe_kursu(k.kurs_id) as kurs, zwroc_nazwe_seansu(k.seans_id) as seans_w_kursie , zwroc_stanowisko_pracownika(k.pracownik_id) as pracownik from kurs_seans k;
+
+/*Widok dla klientow i kursu*/
+CREATE VIEW klient_kurs_widok as  select zwroc_klienta_imie_i_nazwisko(k.klient_id) as klient , zwroc_nazwe_kursu(k.kurs_id) as kurs, zwroc_date(k.data_id) as data from klient_kurs k;
+
+/*Kursy dla jednego klienta*/

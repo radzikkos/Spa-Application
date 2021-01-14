@@ -17,12 +17,12 @@ CREATE TABLE rzecz(
 CREATE TABLE pomieszczenie(
     pomieszczenie_id INTEGER NOT NULL,
     CONSTRAINT pomieszczenie_pk PRIMARY KEY (pomieszczenie_id)
-);
+)
 
 CREATE TABLE seans(
     seans_id SERIAL,
     pomieszczenie_id INTEGER NOT NULL,
-    rodzaj VARCHAR NOT NULL,
+    rodzaj VARCHAR NOT NULL UNIQUE,
     czas_trwania INTEGER NOT NULL,
     CONSTRAINT seans_pk PRIMARY KEY (seans_id),
     CONSTRAINT pomieszczenie_id_fk FOREIGN KEY(pomieszczenie_id) REFERENCES pomieszczenie(pomieszczenie_id)
@@ -39,7 +39,7 @@ CREATE TABLE rzeczy_wykorzystane_do_seansu(
 
 CREATE TABLE wynagrodzenie(
     wynagrodzenie_id SERIAL,
-    kwota INTEGER NOT NULL,
+    kwota INTEGER NOT NULL UNIQUE,
     CONSTRAINT wynagrodzenie_pk PRIMARY KEY(wynagrodzenie_id)
 );
 
@@ -123,6 +123,7 @@ CREATE TRIGGER zmiana_ceny AFTER INSERT OR UPDATE OR DELETE ON kurs_seans
     FOR EACH ROW EXECUTE PROCEDURE zmiana_ceny_kursu();  
 
 /*Kontrolowanie, by w jednym dniu nie bylo wiecej klientow niz 10*/
+/*ODejmowanie rzeczy przy dodawaniu kursow - watpliwa implementacja*/
 CREATE OR REPLACE FUNCTION kontroluj_ilosc_klientow()
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -131,7 +132,11 @@ CREATE OR REPLACE FUNCTION kontroluj_ilosc_klientow()
         max_liczba_klientow_w_dniu integer := 10;
         licznik integer := 0;
         wiersz RECORD;
+        temp1 VARCHAR;
+        temp2 VARCHAR;
     begin
+        select into temp1 sprawdz_czy_kurs_o_id_moze_byc_dodany(NEW.kurs_id);
+        select into temp2 odejmij_rzeczy_z_kursu_o_id(NEW.kurs_id);
         select into licznik count(*) from klient_kurs kk where NEW.data_id = kk.data_id;
         if licznik < max_liczba_klientow_w_dniu then
           return NEW;
@@ -191,6 +196,8 @@ BEGIN
 END;
 $$ --zamkniecie bloku programu
 LANGUAGE plpgsql;  -- deklaracja języka
+
+klient_kurs
 
 /*Funckja znajdujaca id pracownikow robiacyh dany seans po seans_id*/
 CREATE OR REPLACE FUNCTION zwroc_pracownikow_robiacych_seans(int4) RETURNS TABLE (pracownik_id int4) AS
@@ -295,6 +302,23 @@ BEGIN
 END;
 $$ 
 LANGUAGE plpgsql;  
+/*Funckja zwracajaca id senasu seansu po nazwie*/
+CREATE OR REPLACE FUNCTION zwroc_id_seansu(VARCHAR) RETURNS int4 AS
+$$       
+DECLARE   
+    seans_id_ integer := 0;
+    nazwa_ ALIAS FOR $1;
+    
+BEGIN 
+    select into seans_id_ k.seans_id from seans k where k.rodzaj = nazwa_;
+    
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO SEANSU';
+    END IF;
+    return seans_id_;
+END;
+$$ 
+LANGUAGE plpgsql; 
 
 /*Funckja Dane dla danego klienta zwraca kursy oraz daty*/
 CREATE OR REPLACE FUNCTION zwroc_dane_klienta(VARCHAR, VARCHAR) RETURNS TABLE(d VARCHAR, data VARCHAR)  AS
@@ -306,7 +330,7 @@ DECLARE
     wiersz RECORD;
 BEGIN 
     return QUERY
-    select  zwroc_nazwe_kursu(k.kurs_id), zwroc_date(k.data_id) from klient_kurs k where k.klient_id = klient_id_;
+    select  zwroc_nazwe_kursu(k.kurs_id) as kurs, zwroc_date(k.data_id) as data from klient_kurs k where k.klient_id = klient_id_;
 END;
 $$ 
 LANGUAGE plpgsql;  
@@ -330,12 +354,28 @@ END;
 $$ 
 LANGUAGE plpgsql;  
 
+/*Funckja zwraca wynagrodzenie_id po kwocie*/
+CREATE OR REPLACE FUNCTION zwroc_wynagrodzenie_id(int4) RETURNS int4  AS
+$$       
+DECLARE   
+    wynagrodzenie_ ALIAS FOR $1;
+    wyn_id integer := 0;
+BEGIN 
+    select into wyn_id w.wynagrodzenie_id from wynagrodzenie w where w.kwota = wynagrodzenie_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO WYNAGRODZENIA';
+    END IF;
+    return wyn_id;
+END;
+$$ 
+LANGUAGE plpgsql; 
+
 /*Funkcja sprawdzajaca czy pracownik nie pracuje wiecej niz 150minut*/
 CREATE OR REPLACE FUNCTION sprawdz_czas_pracy(int4) RETURNS VARCHAR  AS
 $$       
 DECLARE   
     pracownik_id_ ALIAS FOR $1;
-    max_czas_pracy integer := 150;
+    max_czas_pracy integer := 300;
     czas_pracy integer := 0;
 BEGIN 
     czas_pracy := zwroc_czas_pracy(pracownik_id_);
@@ -349,17 +389,54 @@ $$
 LANGUAGE plpgsql; 
 
 /*Funckja dla podanej daty zwraca klientow*/
-CREATE OR REPLACE FUNCTION zwroc_klientow_w_danym_dniu(int4) RETURNS klient  AS
+CREATE OR REPLACE FUNCTION zwroc_klientow_w_danym_dniu(int4) RETURNS TABLE(id int4)  AS
 $$       
 DECLARE   
     data_id_ ALIAS FOR $1;
     wiersz RECORD;
 BEGIN 
-    for wiersz in (select k.klient_id from klient_kurs k  where k.data_id = data_id_)
+    RETURN QUERY
+    select k.klient_id from klient_kurs k  where k.data_id = data_id_;
     
 END;
 $$ 
 LANGUAGE plpgsql;
+
+/*Funckja dla podanej nazwy zwraca rzecz_id*/
+CREATE OR REPLACE FUNCTION zwroc_rzecz_id(VARCHAR) RETURNS int4 AS
+$$       
+DECLARE   
+    rzecz_nazwa_ ALIAS FOR $1;
+    id integer := 0;
+    
+BEGIN 
+    
+    select into id k.rzecz_id from rzecz k where k.nazwa = rzecz_nazwa_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEJ RZECZY';
+    END IF;
+    return id;
+END;
+$$ 
+LANGUAGE plpgsql; 
+
+/*Dla podanej daty zwraca data_id*/
+CREATE OR REPLACE FUNCTION zwroc_data_id(VARCHAR) RETURNS int4 AS
+$$       
+DECLARE   
+    data_ ALIAS FOR $1;
+    dataid integer := 0;
+    
+BEGIN 
+    
+    select into dataid k.data_id from data k where k.data = data_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEJ DATY';
+    END IF;
+    return dataid;
+END;
+$$ 
+LANGUAGE plpgsql; 
 
 /*Funckja zwraca klientow w danym dniu, jako argument podajemy data_id*/
 CREATE OR REPLACE FUNCTION zwroc_klientow_w_danym_dniu(int4) 
@@ -413,11 +490,36 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
+/*Zwraca polaczone imienia i nazwiska po klient_id*/
+CREATE OR REPLACE FUNCTION zwroc_klienta_imie_i_nazwisko(int4) RETURNS  VARCHAR AS
+$$       
+DECLARE   
+    klient_id_ ALIAS FOR $1;
+    imie_ VARCHAR;
+    nazwisko_ VARCHAR;
+BEGIN 
+    
+    select into imie_ k.imie from klient k where k.klient_id = klient_id_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO IMIENIA';
+    END IF;
+    select into nazwisko_ k.nazwisko from klient k where k.klient_id = klient_id_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO NAZWISKA';
+    END IF;
+    return imie_ || ' ' || nazwisko_;
+    
+END;
+$$ 
+LANGUAGE plpgsql;
+
 /*Trigger dla klientow sprawdzajacy poprawnosc danych*/
 CREATE OR REPLACE FUNCTION valid_klient ()
     RETURNS TRIGGER
     LANGUAGE plpgsql
     AS $$
+    DECLARE
+    wiersz RECORD;
     BEGIN
     IF LENGTH(NEW.pesel) <> 11 THEN
         RAISE EXCEPTION 'Niepoprawny pesel';
@@ -430,8 +532,17 @@ CREATE OR REPLACE FUNCTION valid_klient ()
     END IF;
     NEW.imie = lower(NEW.imie);
     NEW.imie = initcap(NEW.imie);
+
     NEW.nazwisko = lower(NEW.nazwisko);
     NEW.nazwisko = initcap(NEW.nazwisko);
+
+    for wiersz in (select * from klient)
+    loop
+      if wiersz.imie = NEW.imie and wiersz.nazwisko = NEW.nazwisko then
+        RAISE EXCEPTION 'Juz taka osoba jest w bazie';
+      end if;
+    end loop;
+
     RETURN NEW;                                                          
     END;
     $$;
@@ -600,3 +711,95 @@ CREATE OR REPLACE FUNCTION valid_wynagrodzenie ()
 CREATE TRIGGER valid_wynagrodzenie
     BEFORE INSERT OR UPDATE  ON wynagrodzenie
     FOR EACH ROW EXECUTE PROCEDURE valid_wynagrodzenie();  
+
+/*Funckja zwraca id pracownika po jego imieniu, nazwisku, stanowisku i wynagrodzeniu*/
+CREATE OR REPLACE FUNCTION zwroc_id_pracownika(VARCHAR, VARCHAR, VARCHAR, int4) RETURNS int4 AS
+$$        -- otwarcie bloku programu
+DECLARE   -- blok deklaracji
+    id_ integer := 0;
+    imie_ ALIAS FOR $1; -- alias argumentów
+    nazwisko_ ALIAS FOR $2;
+    stanowsko_ ALIAS FOR $3;
+    wynagrodzenie_ ALIAS FOR $4;
+BEGIN
+    wynagrodzenie_ = zwroc_wynagrodzenie_id( wynagrodzenie_);
+    select into id_ p.pracownik_id from pracownik p  where p.imie = imie_ and p.nazwisko = nazwisko_ and p.stanowisko = stanowsko_ and p.wynagrodzenie_id = wynagrodzenie_;
+    return id_;
+END;
+$$ --zamkniecie bloku programu
+LANGUAGE plpgsql;  -- deklaracja języka
+
+
+/*Funckja zwraca stanowisko pracownika po jego id*/
+CREATE OR REPLACE FUNCTION zwroc_stanowisko_pracownika(int4) RETURNS VARCHAR AS
+$$        -- otwarcie bloku programu
+DECLARE   -- blok deklaracji
+    id_ ALIAS FOR $1; -- alias argumentów
+    stanowisko_ VARCHAR;
+BEGIN
+    select into stanowisko_ p.stanowisko from pracownik p where p.pracownik_id = id_;
+    if  NOT FOUND THEN
+        RAISE EXCEPTION 'BRAK TAKIEGO STANOWISKA';
+    END IF;
+    return stanowisko_;
+END;
+$$ --zamkniecie bloku programu
+LANGUAGE plpgsql;  -- deklaracja języka
+
+-- /*Funckja zwraca date dala data it*/
+-- CREATE OR REPLACE FUNCTION zwroc_date(int4) RETURNS VARCHAR AS
+-- $$        -- otwarcie bloku programu
+-- DECLARE   -- blok deklaracji
+--     id_ ALIAS FOR $1; -- alias argumentów
+--     data_ VARCHAR;
+-- BEGIN
+--     select into data_ d.data from data d where d.data_id = id_;
+--     if  NOT FOUND THEN
+--         RAISE EXCEPTION 'BRAK TAKIEJ DATY';
+--     END IF;
+--     return data_;
+-- END;
+-- $$ --zamkniecie bloku programu
+-- LANGUAGE plpgsql;  -- deklaracja języka
+
+
+/*FUnckje ktora sprawdzaja i odejmuja rzeczy, ktore sa uzywane w seansach w kursach*/
+CREATE OR REPLACE FUNCTION sprawdz_czy_kurs_o_id_moze_byc_dodany(int4) RETURNS VARCHAR AS
+$$        
+DECLARE   
+    kurs_id_ ALIAS FOR $1; 
+    wiersz RECORD;
+    wierszRzecz RECORD;
+BEGIN
+    for wiersz in (select k.seans_id from kurs_seans k where k.kurs_id = kurs_id_)
+    loop
+      for wierszRzecz in (select r.rzecz_id, r.uzyta_ilosc from rzeczy_wykorzystane_do_seansu r where wiersz.seans_id = r.seans_id)
+      loop
+        if wierszRzecz.uzyta_ilosc > (select rzecz.ilosc from rzecz where rzecz.rzecz_id = wierszRzecz.rzecz_id) then
+            RAISE EXCEPTION 'Za malo rzeczy';
+        end if;
+      end loop;
+    end loop;
+    return 'TRUE';
+END;
+$$ --zamkniecie bloku programu
+LANGUAGE plpgsql; 
+
+CREATE OR REPLACE FUNCTION odejmij_rzeczy_z_kursu_o_id(int4) RETURNS VARCHAR AS
+$$        
+DECLARE   
+    kurs_id_ ALIAS FOR $1; 
+    wiersz RECORD;
+    wierszRzecz RECORD;
+BEGIN
+    for wiersz in (select k.seans_id from kurs_seans k where k.kurs_id = kurs_id_)
+    loop
+      for wierszRzecz in (select r.rzecz_id, r.uzyta_ilosc from rzeczy_wykorzystane_do_seansu r where wiersz.seans_id = r.seans_id)
+      loop
+          UPDATE rzecz set ilosc = (ilosc - wierszRzecz.uzyta_ilosc) where  rzecz_id = wierszRzecz.rzecz_id;
+      end loop;
+    end loop;
+    return 'TRUE';
+END;
+$$ --zamkniecie bloku programu
+LANGUAGE plpgsql; 

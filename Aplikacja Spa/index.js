@@ -23,15 +23,17 @@ app.get('/items', db.getItems)
 app.get('/prices', db.getPrices)
 app.get('/rooms', db.getRooms)
 app.get('/seances', db.getSeances)
+app.get('/seances/:name', db.getSeanceByName)
 app.get('/itemUsedInSeance', db.getItemUsedInSeance)
 app.get('/salaries', db.getSalaries)
 app.get('/employees', db.getEmployees)
-app.get('/employees/:id', db.getEmployeeById)
+app.get('/employees/:id', db.getEmployeeById) /*Poprawic */ /*Zobaczymy czy bedzie potrzeba */
 app.get('/courses', db.getCourses)
 app.get('/courses/:name', db.getCourseByName)
 app.get('/coursesAndSeances', db.getCoursesAndSeances)
 app.get('/coursesAndSeances/:name', db.getCourseAndSeancesByCourseName)
 app.get('/data', db.getData)
+app.get('/data/:data', db.getDataByData) /*Wypisanie klientow w danym dniu */
 app.get('/clients', db.getClients)
 app.get('/clients/:name/:surname', db.getClientByNameAndSurname)
 app.get('/clientsAndCourses', db.getClientsAndCourses)
@@ -46,6 +48,7 @@ app.post('/employees', db.createEmployee)
 app.post('/courses', db.createCourse)
 app.post('/coursesAndSeances', db.createCourseAndSeance)
 app.post('/clients', db.createClient)
+app.post('/clientsAndCourses', db.createClientAndCourse)
 
 
 app.put('/items/:name', db.updateItem)
@@ -55,6 +58,7 @@ app.put('/salaries/:previous_salary', db.updateSalary)
 app.put('/employees/:name/:surname/:workstand/:salary', db.updateEmployee)
 app.put('/courses/:name', db.updateCourse)
 app.put('/coursesAndSeances/:course_name/:seance_name', db.updateCourseAndSeance)
+app.put('/clientsAndCourses/:name/:surname/:data', db.updateClientAndCourse)
 
 app.delete('/items/:name', db.deleteItem)
 app.delete('/prices/:price', db.deletePrice)
@@ -67,6 +71,7 @@ app.delete('/courses/:name', db.deleteCourse)
 app.delete('/coursesAndSeances/:course_name/:seance_name', db.deleteCourseAndSeance)
 app.delete('/data/:data', db.deleteData)
 app.delete('/clients/:name/:surname', db.deleteClient)
+app.delete('/clientsAndCourses/:name/:surname/:data', db.deleteClientAndCourse)
 
 
 app.use((req, res, next) => {

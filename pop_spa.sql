@@ -16,32 +16,32 @@ INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'masaż euk
 INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'bicze wodne', 45); 
 INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES (2,'sauna finska', 20); 
 
-INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (1,1,5);
-INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (1,2,10);
-INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (2,2,4);
+INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (zwroc_id_seansu('masaż tajski'),zwroc_rzecz_id('czekolada'),5);
+INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (zwroc_id_seansu('masaż tajski'),zwroc_rzecz_id('olejek kokosowy'),10);
+INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (zwroc_id_seansu('masaż gorącymi kamieniami'),zwroc_rzecz_id('olejek kokosowy'),4);
 
 INSERT INTO wynagrodzenie(kwota) VALUES (1000);
 INSERT INTO wynagrodzenie(kwota) VALUES (2000);
 INSERT INTO wynagrodzenie(kwota) VALUES (3000);
 
-INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (1,1,'Roman', 'Konopka', 'masażysta');
-INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (2,3,'Adam', 'Nowak', 'masażysta');
-INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (1,1,'Kacper', 'Bal', 'masażysta');
-INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (1,3,'Kinga', 'Krzem', 'fizjoterapeuta');
-INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (5,3,'Kinga', 'Wiejska', 'ratownik');
+INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu('masaż tajski'),zwroc_wynagrodzenie_id(1000),'Roman', 'Konopka', 'masażysta');
+INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu('masaż gorącymi kamieniami'),zwroc_wynagrodzenie_id(3000),'Adam', 'Nowak', 'masażysta');
+INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu('masaż tajski'),zwroc_wynagrodzenie_id(1000),'Kacper', 'Bal', 'masażysta');
+INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu('masaż tajski'),zwroc_wynagrodzenie_id(3000),'Kinga', 'Krzem', 'fizjoterapeuta');
+INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu('bicze wodne'),zwroc_wynagrodzenie_id(3000),'Kinga', 'Wiejska', 'ratownik');
 
 INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('brazylijskie jambo', 1);
 INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('wicher poranka', 2);
 INSERT INTO kurs(nazwa, poziom_luksusu) VALUES ('meksykanskie bueno', 3);
 
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,1,1);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,2,2);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,3,3);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,4,3);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (1,5,5);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,1,1);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,4,1);
-INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (2,3,2);
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('brazylijskie jambo'),zwroc_id_seansu('masaż tajski'),zwroc_id_pracownika('Roman', 'Konopka', 'masażysta',1000));
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('brazylijskie jambo'),zwroc_id_seansu('masaż gorącymi kamieniami'),zwroc_id_pracownika('Adam', 'Nowak', 'masażysta',2500));
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('brazylijskie jambo'),zwroc_id_seansu('masaż czekoladą'),zwroc_id_pracownika('Kacper', 'Bal', 'masażysta',1000));
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('brazylijskie jambo'),zwroc_id_seansu('masaż eukaliptusem'),zwroc_id_pracownika('Kacper', 'Bal', 'masażysta',1000));
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('brazylijskie jambo'),zwroc_id_seansu('sauna finska'),zwroc_id_pracownika('Kinga', 'Wiejska', 'ratownik',2500));
+INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('wicher poranka'),zwroc_id_seansu('bicze wodne'),zwroc_id_seansu('masaż tajski'),zwroc_id_pracownika('Roman', 'Konopka', 'masażysta',1000));
+-- INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('wicher poranka'),4,1);
+-- INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id('wicher poranka'),3,2);
 
 INSERT INTO data(data) VALUES ('01-01-2020');
 INSERT INTO data(data) VALUES ('02-01-2020');
@@ -60,13 +60,13 @@ INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Benjamin', 'Cynk', '123456789
 INSERT INTO klient(imie, nazwisko, pesel) VALUES ('Beata', 'BAT', '12345678904');
 
 
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (1,1,1);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (1,2,2);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (1,1,3);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (1,1,7);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (2,2,6);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (2,2,1);
-INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (3,2,1);
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Jan', 'Kowalski'),zwroc_kurs_id('brazylijskie jambo'),zwroc_data_id('01-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Jan', 'Kowalski'),zwroc_kurs_id('wicher poranka'),zwroc_data_id('02-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Jan', 'Kowalski'),zwroc_kurs_id('brazylijskie jambo'),zwroc_data_id('03-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Jan', 'Kowalski'),zwroc_kurs_id('brazylijskie jambo'),zwroc_data_id('07-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Dorota', 'Cynk'),zwroc_kurs_id('wicher poranka'),zwroc_data_id('06-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Dorota', 'Cynk'),zwroc_kurs_id('wicher poranka'),zwroc_data_id('01-01-2020'));
+INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id('Benjamin', 'Cynk'),zwroc_kurs_id('wicher poranka'),zwroc_data_id('01-01-2020'));
 /*Drop*/
 DROP TABLE KLIENT CASCADE;
 DROP TABLE DATA CASCADE;
