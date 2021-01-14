@@ -1,19 +1,20 @@
 const Pool = require('pg').Pool
 const pool = new Pool({
-        user: 'ibwbksua',
-        host: 'ziggy.db.elephantsql.com',
-        database: 'ibwbksua',
-        password: 'lyyCPZGsY_DRtnOYdRY8RdvbwxHf175w',
-    })
-    /**Poprawic trigger dla klient-kurs, by odejmowal ilosc rzeczy */
-    /*Napisac get sb by ID */
-    /* 
+    user: 'ibwbksua',
+    host: 'ziggy.db.elephantsql.com',
+    database: 'ibwbksua',
+    password: 'lyyCPZGsY_DRtnOYdRY8RdvbwxHf175w',
+})
+
+/*Napisac get sb by ID */
+
+/* 
     CRUD for items
 */
 const getItems = (request, response) => {
     pool.query('SELECT * FROM rzeczy_cena', (error, results) => {
         if (error) {
-            throw error
+            return response.status(400).send('Nie mozna wypisac cen')
         }
         response.status(200).json(results.rows)
     })
@@ -410,7 +411,7 @@ const createCourseAndSeance = (request, response) => {
     const { course_name, seance_name, name, surname, workstand, salary } = request.body[0]
     pool.query('INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id($1),zwroc_id_seansu($2),zwroc_id_pracownika($3, $4, $5,$6));', [course_name, seance_name, name, surname, workstand, salary], (error, results) => {
         if (error) {
-            return response.status(400).send('Pracownik pracuje za dlugo lub klientow jest wiecej niz 10 lub brakuje jakiejs rzeczy')
+            return response.status(400).send('Pracownik pracuje za dlugo ')
         }
         response.status(201).send(`Seansu do kursu dodany`)
     })
@@ -444,9 +445,10 @@ const deleteCourseAndSeance = (request, response) => {
  * CRUD for data
  */
 const getData = (request, response) => {
-    pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
+    //pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
+    pool.query('SELECT * from przychody', (error, results) => {
         if (error) {
-            return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
+            return response.status(400).send(`Nie mozna wypisac daty`)
         }
         response.status(200).json(results.rows)
     })
@@ -455,7 +457,6 @@ const getDataByData = (request, response) => {
         const data = request.params.data
         pool.query(' select k.imie, k.nazwisko from klient k where k.klient_id IN (select zwroc_klientow_w_danym_dniu(zwroc_data_id($1)))', [data], (error, results) => {
             if (error) {
-                throw error
                 return response.status(400).send(`Nie mozna wypisac klientow w tym dniu`)
             }
             response.status(200).json(results.rows)
@@ -536,7 +537,7 @@ const createClientAndCourse = (request, response) => {
     const { name, surname, course_name, data } = request.body[0]
     pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id($1, $2),zwroc_kurs_id($3),zwroc_data_id($4))', [name, surname, course_name, data], (error, results) => {
         if (error) {
-            return response.status(400).send('Nie mozna dodac klienta do kursu')
+            return response.status(400).send('Nie mozna dodac klienta do kursu lub klientow jest wiecej niz 10 lub brakuje jakiejs rzeczy')
         }
         response.status(201).send(`Klient zapisany na kurs`)
     })
@@ -570,6 +571,26 @@ const deleteClientAndCourse = (request, response) => {
     })
 }
 
+/*GET for employees working with that seance */
+const getSeanceEmployees = (request, response) => {
+    const name = request.params.name
+    pool.query('select zwroc_pracownikow_robiacych_seans(zwroc_id_seansu(($1))) as pracownik', [name], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac Pracownikow robiacych dany seans`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+/*Get employees worktime */
+const getEmployeesWorkTime = (request, response) => {
+    pool.query('select * from pracownik_i_czas_pracy', (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac Pracownikow robiacych dany seans`)
+        }
+        response.status(200).json(results.rows)
+    })
+}
 
 module.exports = {
     /*Items */
@@ -645,4 +666,8 @@ module.exports = {
     updateClientAndCourse,
     deleteClientAndCourse,
 
+    /*SeancesAndEmployees */
+    getSeanceEmployees,
+    /**Employees worktime */
+    getEmployeesWorkTime,
 }

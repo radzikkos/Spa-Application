@@ -16,7 +16,8 @@ app.use(bodyParser.raw());
 
 
 app.get('/', (req, res) => {
-    res.json({ info: 'Node.js, Express, and Postgres API' })
+    //res.json({ info: 'Node.js, Express, and Postgres API' })
+    res.sendFile(__dirname + '/template/index.html')
 })
 
 app.get('/items', db.getItems)
@@ -37,6 +38,9 @@ app.get('/data/:data', db.getDataByData) /*Wypisanie klientow w danym dniu */
 app.get('/clients', db.getClients)
 app.get('/clients/:name/:surname', db.getClientByNameAndSurname)
 app.get('/clientsAndCourses', db.getClientsAndCourses)
+
+app.get('/seanceEmployees/:name', db.getSeanceEmployees)
+app.get('/employeesWorkTime', db.getEmployeesWorkTime)
 
 app.post('/items', db.createItem)
 app.post('/prices', db.createPrice)
