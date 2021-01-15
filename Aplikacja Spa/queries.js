@@ -1,14 +1,15 @@
 const Pool = require('pg').Pool
 const pool = new Pool({
-    user: 'ibwbksua',
-    host: 'ziggy.db.elephantsql.com',
-    database: 'ibwbksua',
-    password: 'lyyCPZGsY_DRtnOYdRY8RdvbwxHf175w',
-})
-
-/*Napisac get sb by ID */
-
+        user: 'ibwbksua',
+        host: 'ziggy.db.elephantsql.com',
+        database: 'ibwbksua',
+        password: 'lyyCPZGsY_DRtnOYdRY8RdvbwxHf175w',
+    })
+    /**Dorobic wypisywanie czasu pracy pracownikow */
+    /*Napisac get sb by ID */
+    /* 
 /* 
+    /* 
     CRUD for items
 */
 const getItems = (request, response) => {
@@ -445,10 +446,9 @@ const deleteCourseAndSeance = (request, response) => {
  * CRUD for data
  */
 const getData = (request, response) => {
-    //pool.query('SELECT data from data ORDER BY data DESC', (error, results) => {
     pool.query('SELECT * from przychody', (error, results) => {
         if (error) {
-            return response.status(400).send(`Nie mozna wypisac daty`)
+            return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
         }
         response.status(200).json(results.rows)
     })
@@ -480,14 +480,16 @@ const deleteData = (request, response) => {
  */
 
 const getClients = (request, response) => {
-    pool.query('SELECT * from klient', (error, results) => {
-        if (error) {
-            return response.status(400).send(`Nie mozna wypisac klientow`)
-        }
-        response.status(200).json(results.rows)
-    })
-}
-
+        pool.query('SELECT * from klient', (error, results) => {
+            if (error) {
+                return response.status(400).send(`Nie mozna wypisac klientow`)
+            }
+            response.status(200).json(results.rows)
+        })
+    }
+    /**Z biegiem czasu mozna sprawdzicz , czy da sie wyszukiwac tylko po peselu zamiast po imieniu
+     * i nazwisku, wtedy mozna zmienic trigger, by moglo byc dwoch takich samym imie i nazywsko
+     */
 const getClientByNameAndSurname = (request, response) => {
     const name = request.params.name
     const surname = request.params.surname
@@ -666,8 +668,8 @@ module.exports = {
     updateClientAndCourse,
     deleteClientAndCourse,
 
-    /*SeancesAndEmployees */
+    /**E,ployees doing that seance */
     getSeanceEmployees,
-    /**Employees worktime */
+    /**Employees work time get */
     getEmployeesWorkTime,
 }
