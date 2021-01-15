@@ -17,7 +17,8 @@ const getItems = (request, response) => {
         if (error) {
             return response.status(400).send('Nie mozna wypisac cen')
         }
-        response.status(200).json(results.rows)
+        //response.status(200).json(results.rows)
+        response.render('index.ejs', { quotes: results.rows })
     })
 }
 

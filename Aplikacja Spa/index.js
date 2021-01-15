@@ -4,6 +4,8 @@ const app = express()
 const port = 3000
 const db = require('./queries')
 
+/*Tell Express that EJS is used */
+app.set('view engine', 'ejs')
 
 // app.use(express.json())
 app.use(bodyParser.json())
@@ -16,8 +18,8 @@ app.use(bodyParser.raw());
 
 
 app.get('/', (req, res) => {
-    //res.json({ info: 'Node.js, Express, and Postgres API' })
-    res.sendFile(__dirname + '/template/index.html')
+    res.json({ info: 'Node.js, Express, and Postgres API' })
+        //res.sendFile(__dirname + '/template/index.html')
 })
 
 app.get('/items', db.getItems)
