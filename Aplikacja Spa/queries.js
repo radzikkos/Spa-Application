@@ -13,23 +13,27 @@ const pool = new Pool({
     CRUD for items
 */
 const getItems = (request, response) => {
-    pool.query('SELECT * FROM rzeczy_cena', (error, results) => {
+    pool.query('SELECT * FROM rzeczy_cena ORDER BY rzecz_id DESC', (error, results) => {
         if (error) {
             return response.status(400).send('Nie mozna wypisac cen')
         }
         //response.status(200).json(results.rows)
-        response.render('index.ejs', { quotes: results.rows })
+        // response.render('index.ejs', { quotes: results.rows })
+        response.render('pages/items', { items: results.rows, result: "" })
     })
 }
 
 const createItem = (request, response) => {
-    const { price, name, amount } = request.body[0]
+    //console.log(request.body)
+    const { price, name, amount } = request.body
     pool.query('INSERT INTO rzecz(cena_id, nazwa, ilosc) VALUES (zwroc_id_ceny($1),$2,$3); ', [price, name, amount], (error, results) => {
         if (error) {
-            return response.status(400).send('Nie mozna dodac tego przedmiotu')
+            return response.status(400).render('pages/items', { items: 0, result: "Nie udało się dodać przedmiotu" })
         }
-        response.status(201).send(`Przedmiot ${name} zostal dodany`)
+
+        return response.status(201).render('pages/items', { items: results.rows, result: "Przedmiot został dodany" })
     })
+
 }
 
 const updateItem = (request, response) => {
@@ -59,23 +63,25 @@ const deleteItem = (request, response) => {
 CRUD for prices
 */
 const getPrices = (request, response) => {
-    pool.query('SELECT cena_pojedynczej_sztuki as cena FROM cena_rzeczy ORDER BY cena DESC', (error, results) => {
+    pool.query('SELECT cena_id , cena_pojedynczej_sztuki as cena FROM cena_rzeczy ORDER BY cena DESC', (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).json(results.rows)
+        //response.status(200).json(results.rows)
+        response.render('pages/prices', { items: results.rows, result: "" })
     })
 }
 
 const createPrice = (request, response) => {
 
-    const price = request.body[0]['price']
+    //const price = request.body[0]['price']
+    const { price } = request.body
     pool.query('INSERT INTO cena_rzeczy (cena_pojedynczej_sztuki) VALUES ($1)', [price], (error, results) => {
         if (error) {
-            //throw error
-            return response.status(400).send('Nie mozna dodac tej wartosci')
+            return response.status(400).render('pages/prices', { items: 0, result: "Nie udało się dodać ceny" })
+
         }
-        response.status(201).send(`Cena ${price} zlote zostala dodana`)
+        return response.status(201).render('pages/prices', { items: results.rows, result: "Cena została dodana" })
     })
 }
 

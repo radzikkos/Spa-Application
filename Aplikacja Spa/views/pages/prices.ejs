@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <!-- <link rel="stylesheet" href="stylesheet.css"> -->
+        <!-- <script>
+            function addItem() {
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+        </script> -->
+
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Możliwe ceny produktów</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj cenę</button>
+
+
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+                            <form action="/prices" method="POST" id="itemsFormAdd">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="price">Nowa cena </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="price" name="price" size="20" placeholder="Wprowadź cenę" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj cenę" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </form>
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Cena: </span>
+                                        <span class="output">
+                                    <%= items[i].cena %>
+                                    <!-- <form method="POST" action="/prices/delete/"+<%= items[i].cena_id %> >
+                                        <input type="submit" value="Usuń cenę " >
+                                    </form> -->
+                                    <!-- <button id="delete-button">Usuń cenę</button> -->
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+</body>
+
+</html>

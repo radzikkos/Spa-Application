@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Rzeczy w magazynie</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj do magazynu</button>
+
+
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+                            <form action="/items" method="POST" id="itemsFormAdd">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="name">Nazwa przedmiotu </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="name" name="name" size="20" placeholder="Wprowadź nazwę" required><br>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="price">Cena przedmiotu </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="price" name="price" value="" min="0" placeholder="Wprowadź cenę" required><br>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="amount">Ilość sztuk </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="amount" name="amount" min="0" placeholder="Wprowadź ilość sztuk" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj do magazynu" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Nazwa produktu:</span>
+                                        <span class="output">
+                            <%= items[i].nazwa %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Ilość w magazynie:</span>
+                                        <span class="output">
+                            <%= items[i].ilosc %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Cena za sztukę:</span>
+                                        <span class="output">
+                                <%= items[i].cena_pojedynczej_sztuki %>
+                            </span>
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>
