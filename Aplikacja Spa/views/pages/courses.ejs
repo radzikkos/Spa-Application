@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <script>
+            function addItem() {
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+            const deleteCourse = (seand_id) => {
+                fetch('courses/' + seand_id, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => {
+                        response.json().then(json => {
+                            return json;
+                        })
+                    })
+                location.reload();
+            }
+
+            const moreInformation = (url, item) => {
+                fetch(url + '/' + item)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Zawiera seans: </span><span class="output">${item.seans}</span></br>`
+
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
+
+                    });
+            }
+        </script>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Dostępne kursy</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj kurs</button>
+
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+                            <form action="/courses" method="POST" id="itemsFormAdd">
+                                <table>
+
+                                    <tr>
+                                        <td>
+                                            <label for="name">Nazwa kursu </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="name" name="name" placeholder="Wprowadź nazwę" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="name">Poziom wygód </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="level" name="level" min="0" placeholder="Wprowadź poziom wygód" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj wynagrodzenie" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Nazwa kursu :</span>
+                                        <span class="output">
+                                        <%= items[i].nazwa %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Poziom luksusu:</span>
+                                        <span class="output">
+                                        <%= items[i].poziom_luksusu %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Cena za całość :</span>
+                                        <span class="output">
+                                        <%= items[i].cena_za_calosc %>
+                                        </span>
+                                        </br>
+                                        <button type="button" id="buttonToAdd" onclick="moreInformation('courses','<%= items[i].nazwa %>')">Szczegółowe informacje co kurs zawiera</button>
+
+                                        <button type="button" id="buttonToAdd" onclick="deleteCourse('<%= items[i].nazwa %>')">Usuń</button>
+
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>

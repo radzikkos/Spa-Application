@@ -3,7 +3,6 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <!-- <link rel="stylesheet" href="stylesheet.css"> -->
         <script>
             function addItem() {
                 document.getElementById("items").style.display = "none";
@@ -11,20 +10,32 @@
                 document.getElementById("buttonToAdd").style.display = "none";
                 document.getElementById("result").style.display = "none";
             }
+            const deleteData = (url, id) => {
+                fetch(url + '/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => {
+                        response.json().then(json => {
+                            return json;
+                        })
+                    })
+                location.reload();
+            }
         </script>
-
 </head>
 
 <body class="container">
 
     <header>
         <%- include('../partials/header'); %>
-
     </header>
     <main>
         <div class="jumbotron">
-            <h1 class="Title">Możliwe ceny produktów</h1>
-            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj cenę</button>
+            <h1 class="Title">Możliwe wynagrodzenia pracowników</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj wynagrodzenie</button>
 
 
             <% if (result) { %>
@@ -38,24 +49,24 @@
 
 
                         <div>
-                            <form action="/prices" method="POST" id="itemsFormAdd">
+                            <form action="/salaries" method="POST" id="itemsFormAdd">
                                 <table>
+
                                     <tr>
                                         <td>
-                                            <label for="price">Nowa cena </label>
+                                            <label for="salary">Kwota wynagrodzenia </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="price" name="price" size="20" placeholder="Wprowadź cenę" required><br>
+                                            <input type="number" id="salary" name="salary" min="0" placeholder="Nr" required><br>
                                         </td>
 
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td>
-                                            <input type="submit" value="Dodaj cenę" id="buttonToAddCD">
+                                            <input type="submit" value="Dodaj wynagrodzenie" id="buttonToAddCD">
                                         </td>
                                     </tr>
-
 
                                 </table>
                             </form>
@@ -64,13 +75,12 @@
                                 <% for(var i = 0; i < items.length; i++) {%>
                                     <div class="outputBoxes">
 
-                                        <span class="outputTitle">Cena: </span>
+                                        <span class="outputTitle">Kwota :</span>
                                         <span class="output">
-                                    <%= items[i].cena %>
-                                    <!-- <form method="POST" action="/prices/delete/"+<%= items[i].cena_id %> >
-                                        <input type="submit" value="Usuń cenę " >
-                                    </form> -->
-                                    <!-- <button id="delete-button" onclick="fetchDelete('prices',50">Usuń cenę</button> -->
+                                        <%= items[i].kwota %>
+                                        </span>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('salaries','<%= items[i].kwota %>')">Usuń</button>
+
                                     </div>
                                     <% } %>
                             </ul>
@@ -81,6 +91,7 @@
     <footer>
         <%- include('../partials/footer'); %>
     </footer>
+
 </body>
 
 </html>

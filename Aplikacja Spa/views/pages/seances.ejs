@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <script>
+            function addItem() {
+                document.getElementById("buttonToAdd1").style.display = "none";
+                document.getElementById("extraInformationAboutSeance").style.display = "none";
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("buttonToShow").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+
+            const moreInformation = (item) => {
+                fetch('/seances/' + item)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Wykorzystana rzecz: </span><span class="output">${item.nazwa}</span></br><span class="outputTitle"> Wykorzystana ilość: </span><span class="output">${item.uzyta_ilosc}</span></br>`
+
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
+
+                    });
+            }
+            const deleteData = (url, id) => {
+                fetch(url + '/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => {
+                        response.json().then(json => {
+                            return json;
+                        })
+                    })
+                location.reload();
+            }
+
+            function addItemToSeance() {
+                document.getElementById("buttonToAdd1").style.display = "none";
+                document.getElementById("extraInformationAboutSeance").style.display = "none";
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsToSeanceAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("buttonToShow").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+            const showEmployeesDoingSeance = (url, id) => {
+                fetch('/seanceEmployees/' + id)
+                    .then(response => {
+                        if (!response.ok) {
+                            document
+                                .querySelector("#extraInformationAboutSeance").innerHTML = " ";
+                            //throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Pracownik robiący wybrany seans</span></br><span class="outputTitle"> </span><span class="output">${item.pracownik}</br>`
+
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
+
+                    });
+            }
+        </script>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Dostępne seanse</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj seans</button>
+            <button type="button" id="buttonToAdd1" onclick="addItemToSeance()">Dodaj rzecz do seansu</button>
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+                        <div>
+                            <form action="/seances" method="POST" id="itemsFormAdd">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="room">Pokój nr </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="room" name="room" size="20" placeholder="Wprowadź nr pokoju" required><br>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="type">Rodzaj seansu </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="type" name="type" placeholder="Wprowadź nazwę" required><br>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="time">Czas trwania </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="time" name="time" min="0" placeholder="Wprowadź czas trwania" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj seans" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+
+                            <form action="/itemUsedInSeance" method="POST" id="itemsToSeanceAdd">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="item">Nazwa rzeczy </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="item_name" name="item_name" size="20" placeholder="Wprowadź nazwę rzeczy" required><br>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="seance">Rodzaj seansu </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="seance_name" name="seance_name" size="20" placeholder="Wprowadź nazwę seansu" required><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="seance">Podaj ilość </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="amount" name="amount" size="20" placeholder="Ilość rzeczy" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj rzecz do seansu" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Nr pomieszczenia</span>
+                                        <span class="output">
+                                        <%= items[i].nr_pomieszczenia %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Rodzaj seansu</span>
+                                        <span class="output">
+                                        <%= items[i].rodzaj %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Czas trwania</span>
+                                        <span class="output">
+                                        <%= items[i].czas_trwania %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Liczba rodzajów produktów</span>
+                                        <span class="output">
+                                        <%= items[i].liczba_rodzajow_produktow %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Łączna liczba zużytych produktów</span>
+                                        <span class="output">
+                                            <% if (items[i].liczba_produktow == null) { %>
+                                                0
+                                
+                                                <%} else { %>
+                                                    <%= items[i].liczba_produktow %>                
+                                                    <% } %>
+                                        </span>
+                                        </br>
+                                        <button type="button" id="buttonToAdd" onclick="moreInformation('<%= items[i].rodzaj %>')">Szczegółowe informacje</button>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('/courses','<%= items[i].seans_id %>')">Usuń</button>
+                                        <button type="button" id="buttonToAdd" onclick="showEmployeesDoingSeance('/seanceEmployees/','<%= items[i].rodzaj %>')">Wypisz pracowników robiących ten seans</button>
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>

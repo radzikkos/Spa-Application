@@ -3,7 +3,14 @@
 
 <head>
     <%- include('../partials/head'); %>
-
+        <script>
+            function addItem() {
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+        </script>
 </head>
 
 <body class="container">
@@ -11,7 +18,6 @@
     <header>
         <%- include('../partials/header'); %>
     </header>
-
     <main>
         <div class="jumbotron">
             <h1 class="Title">Rzeczy w magazynie</h1>

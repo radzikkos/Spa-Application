@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <script>
+            function addItem() {
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+            const deleteData = (url, id) => {
+                fetch(url + '/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => {
+                        response.json().then(json => {
+                            return json;
+                        })
+                    })
+                location.reload();
+            }
+        </script>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Spis pracowników</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj pracownika</button>
+
+
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+                            <form action="/employees" method="POST" id="itemsFormAdd">
+                                <table>
+
+                                    <tr>
+                                        <td>
+                                            <label for="name">Imię </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="name" name="name" placeholder="Imię" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="surname">Nazwisko </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="surname" name="surname" placeholder="Imię" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="workstand">Stanowisko </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="workstand" name="workstand" placeholder="Stanowisko pracy" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="seance_name">Seans jakim się zajmuje </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="seance_name" name="seance_name" placeholder="Seans" required><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="salary">Wynagrodzenie </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="salary" name="salary" placeholder="Wynagrodzenie" required><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj Pracownika" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Imię :</span>
+                                        <span class="output">
+                                        <%= items[i].imie %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Nazwisko :</span>
+                                        <span class="output">
+                                        <%= items[i].nazwisko %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Stanowisko :</span>
+                                        <span class="output">
+                                        <%= items[i].stanowisko %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Zarobki :</span>
+                                        <span class="output">
+                                        <%= items[i].kwota %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Czas pracy :</span>
+                                        <span class="output">
+                                        <%= items[i].zwroc_czas_pracy %>
+                                        </span>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('employees','<%= items[i].pracownik_id %>')">Usuń pracownika</button>
+
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>
