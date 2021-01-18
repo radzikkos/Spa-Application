@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <script>
+            function addItem() {
+                document.getElementById("extraInformationAboutSeance").style.display = "none";
+                document.getElementById("items").style.display = "none";
+                document.getElementById("itemsFormAdd").style.display = "inline";
+                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("result").style.display = "none";
+            }
+
+            const moreInformation = (url, item) => {
+                fetch(url + '/' + item)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Dokonał rezerwacji w wybranym dniu</span></br><span class="output">${item.imie} ${item.nazwisko}</span></br>`
+
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
+
+                    });
+            }
+        </script>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Terminarz</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj datę</button>
+
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+                            <form action="/data" method="POST" id="itemsFormAdd">
+                                <table>
+
+                                    <tr>
+                                        <td>
+                                            <label for="data">Podaj datę </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="data" name="data" placeholder="dd-mm-rr" required><br>
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="Dodaj datę" id="buttonToAddCD">
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </form>
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Dzień :</span>
+                                        <span class="output">
+                                        <%= items[i].dzien %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Przychody :</span>
+                                        <span class="output">
+                                        <%= items[i].zysk_na_dzien %>
+                                        </span>
+                                        </br>
+
+                                        <button type="button" id="buttonToAdd" onclick="moreInformation('data','<%= items[i].data_id %>')">Pokaż klientów w tym dniu</button>
+
+
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>

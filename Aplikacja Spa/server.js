@@ -38,9 +38,9 @@ app.get('/courses/:name', db.getCourseByName)
 app.get('/coursesAndSeances', db.getCoursesAndSeances)
 app.get('/coursesAndSeances/:name', db.getCourseAndSeancesByCourseName)
 app.get('/data', db.getData)
-app.get('/data/:data', db.getDataByData) /*Wypisanie klientow w danym dniu */
+app.get('/data/:id', db.getDataByData) /*Wypisanie klientow w danym dniu */
 app.get('/clients', db.getClients)
-app.get('/clients/:name/:surname', db.getClientByNameAndSurname)
+app.get('/clients/:id', db.getClientByNameAndSurname)
 app.get('/clientsAndCourses', db.getClientsAndCourses)
 
 app.get('/seanceEmployees/:name', db.getSeanceEmployees)
@@ -55,6 +55,7 @@ app.post('/salaries', db.createSalary)
 app.post('/employees', db.createEmployee)
 app.post('/courses', db.createCourse)
 app.post('/coursesAndSeances', db.createCourseAndSeance)
+app.post('/data', db.createData)
 app.post('/clients', db.createClient)
 app.post('/clientsAndCourses', db.createClientAndCourse)
 
@@ -78,7 +79,7 @@ app.delete('/employees/:id', db.deleteEmployee)
 app.delete('/courses/:name', db.deleteCourse)
 app.delete('/coursesAndSeances/:course_name/:seance_name', db.deleteCourseAndSeance)
 app.delete('/data/:data', db.deleteData)
-app.delete('/clients/:name/:surname', db.deleteClient)
+app.delete('/clients/:id', db.deleteClient)
 app.delete('/clientsAndCourses/:name/:surname/:data', db.deleteClientAndCourse)
 
 

@@ -108,7 +108,11 @@
                             <ul id="items">
                                 <% for(var i = 0; i < items.length; i++) {%>
                                     <div class="outputBoxes">
-
+                                        <span class="outputTitle">Id pracownika :</span>
+                                        <span class="output">
+                                        <%= items[i].pracownik_id %>
+                                        </span>
+                                        </br>
                                         <span class="outputTitle">Imię :</span>
                                         <span class="output">
                                         <%= items[i].imie %>
@@ -126,12 +130,12 @@
                                         </br>
                                         <span class="outputTitle">Zarobki :</span>
                                         <span class="output">
-                                        <%= items[i].kwota %>
+                                        <%= items[i].zarobki_per_h %>
                                         </span>
                                         </br>
                                         <span class="outputTitle">Czas pracy :</span>
                                         <span class="output">
-                                        <%= items[i].zwroc_czas_pracy %>
+                                        <%= items[i].czas_pracy %>
                                         </span>
                                         <button type="button" id="buttonToAdd" onclick="deleteData('employees','<%= items[i].pracownik_id %>')">Usuń pracownika</button>
 

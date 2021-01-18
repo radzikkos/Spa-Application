@@ -12,8 +12,8 @@
                 document.getElementById("buttonToAdd").style.display = "none";
                 document.getElementById("result").style.display = "none";
             }
-            const deleteCourse = (seand_id) => {
-                fetch('courses/' + seand_id, {
+            const deleteData = (url, id) => {
+                fetch(url + '/' + id, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -26,33 +26,32 @@
                     })
                 location.reload();
             }
-
             const moreInformation = (url, item) => {
-                    fetch(url + '/' + item)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw Error("ERRROR")
-                            }
-                            return response.json();
-                        })
-                        .then(responseData => {
-                            console.log(responseData)
-                            html = responseData.map(item => {
-                                return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Zawiera seans: </span><span class="output">${item.seans}</span></br>`
+                fetch(url + '/' + item)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Rezerwacja w danym dniu</span></br><span class="output">${item.klient_kursy}</span></br>`
 
-                            }).join("")
-                            document
-                                .querySelector("#extraInformationAboutSeance").innerHTML = html;
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
 
-                        });
-                }
-                /*Add seance to course*/
-            function addItemToSeance() {
+                    });
+            }
+
+            function addClientToCourse() {
                 document.getElementById("buttonToAdd1").style.display = "none";
+                document.getElementById("buttonToAdd").style.display = "none";
                 document.getElementById("extraInformationAboutSeance").style.display = "none";
                 document.getElementById("items").style.display = "none";
-                document.getElementById("itemsToSeanceAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
+                document.getElementById("clientToCourse").style.display = "inline";
                 document.getElementById("buttonToShow").style.display = "none";
                 document.getElementById("result").style.display = "none";
             }
@@ -66,9 +65,10 @@
     </header>
     <main>
         <div class="jumbotron">
-            <h1 class="Title">Dostępne kursy</h1>
-            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj kurs</button>
-            <button type="button" id="buttonToAdd1" onclick="addItemToSeance()">Dodaj seans do kursu</button>
+            <h1 class="Title">Klienci</h1>
+            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj klienta</button>
+            <button type="button" id="buttonToAdd1" onclick="addClientToCourse()">Zapisz klienta na kurs w wybranym dniu</button>
+
             <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>
                 <div id="result">
@@ -81,70 +81,79 @@
 
 
                         <div>
-                            <form action="/courses" method="POST" id="itemsFormAdd">
+                            <form action="/clientsAndCourses" method="POST" id="clientToCourse">
                                 <table>
 
                                     <tr>
                                         <td>
-                                            <label for="name">Nazwa kursu </label>
+                                            <label for="client_id">Id Klienta : </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="name" name="name" placeholder="Wprowadź nazwę" required><br>
+                                            <input type="text" id="client_id" name="client_id" placeholder="Id klienta" required><br>
                                         </td>
 
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label for="name">Poziom wygód </label>
+                                            <label for="course_name">Podaj nazwę kursu : </label>
                                         </td>
                                         <td>
-                                            <input type="number" id="level" name="level" min="0" placeholder="Wprowadź poziom wygód" required><br>
+                                            <input type="text" id="course_name" name="course_name" placeholder="Nazwa kursu" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="data">Termin : </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="data" name="data" placeholder="dd-mm-rr" required><br>
                                         </td>
 
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td>
-                                            <input type="submit" value="Dodaj kurs" id="buttonToAddCD">
+                                            <input type="submit" value="Zapisz klienta" id="buttonToAddCD">
                                         </td>
                                     </tr>
 
                                 </table>
                             </form>
-
-                            <form action="/coursesAndSeances" method="POST" id="itemsToSeanceAdd">
+                            <form action="/clients" method="POST" id="itemsFormAdd">
                                 <table>
-                                    <tr>
-                                        <td>
-                                            <label for="item">Nazwa kursu </label>
-                                        </td>
-                                        <td>
-                                            <input type="text" id="course_name" name="course_name" size="20" placeholder="Wprowadź nazwę kursu" required><br>
-                                        </td>
-
-                                    </tr>
 
                                     <tr>
                                         <td>
-                                            <label for="seance">Rodzaj seansu </label>
+                                            <label for="name">Imię : </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="seance_name" name="seance_name" size="20" placeholder="Wprowadź nazwę seansu" required><br>
+                                            <input type="text" id="name" name="name" placeholder="Podaj imię" required><br>
                                         </td>
+
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label for="employee_id">Podaj id pracownika </label>
+                                            <label for="surname">Nazwisko : </label>
                                         </td>
                                         <td>
-                                            <input type="number" id="employee_id" name="employee_id" size="20" placeholder="Id pracownika" required><br>
+                                            <input type="text" id="surname" name="surname" placeholder="Podaj nazwisko" required><br>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="pesel">Pesel : </label>
+                                        </td>
+                                        <td>
+                                            <input type="number" id="pesel" name="pesel" placeholder="Podaj pesel" required><br>
                                         </td>
 
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td>
-                                            <input type="submit" value="Dodaj seans do kursu" id="buttonToAddCD">
+                                            <input type="submit" value="Dodaj klienta" id="buttonToAddCD">
                                         </td>
                                     </tr>
 
@@ -154,25 +163,29 @@
                             <ul id="items">
                                 <% for(var i = 0; i < items.length; i++) {%>
                                     <div class="outputBoxes">
+                                        <span class="outputTitle">Id klienta :</span>
+                                        <span class="output">
+                                        <%= items[i].klient_id %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Imię :</span>
+                                        <span class="output">
+                                        <%= items[i].imie %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Nazwisko :</span>
+                                        <span class="output">
+                                        <%= items[i].nazwisko %>
+                                        </span>
+                                        </br>
+                                        <span class="outputTitle">Pesel :</span>
+                                        <span class="output">
+                                        <%= items[i].pesel %>
+                                        </span>
+                                        </br>
+                                        <button type="button" id="buttonToAdd" onclick="moreInformation('clients','<%= items[i].klient_id %>')">Szczegółowe informacje co kliencie</button>
 
-                                        <span class="outputTitle">Nazwa kursu :</span>
-                                        <span class="output">
-                                        <%= items[i].nazwa %>
-                                        </span>
-                                        </br>
-                                        <span class="outputTitle">Poziom luksusu:</span>
-                                        <span class="output">
-                                        <%= items[i].poziom_luksusu %>
-                                        </span>
-                                        </br>
-                                        <span class="outputTitle">Cena za całość :</span>
-                                        <span class="output">
-                                        <%= items[i].cena_za_calosc %>
-                                        </span>
-                                        </br>
-                                        <button type="button" id="buttonToAdd" onclick="moreInformation('courses','<%= items[i].nazwa %>')">Szczegółowe informacje co kurs zawiera</button>
-
-                                        <button type="button" id="buttonToAdd" onclick="deleteCourse('<%= items[i].nazwa %>')">Usuń</button>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('clients','<%= items[i].klient_id %>')">Usuń</button>
 
                                     </div>
                                     <% } %>

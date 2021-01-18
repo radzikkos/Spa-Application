@@ -62,6 +62,10 @@
                                                     display: none;
                                                 }
                                                 
+                                                #clientToCourse {
+                                                    display: none;
+                                                }
+                                                
                                                 #result {
                                                     width: 400px;
                                                     height: 80px;

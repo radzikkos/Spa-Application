@@ -158,7 +158,7 @@ const getSeanceByName = (request, response) => {
 const createSeance = (request, response) => {
     const { room, type, time } = request.body
     if (!/^[a-zA-Z]+$/.test(type)) {
-        return response.status(400).render('pages/items', { items: 0, result: "Nie udało się dodać seansu" })
+        return response.status(400).render('pages/seances', { items: 0, result: "Nie udało się dodać seansu" })
     }
     pool.query('INSERT INTO seans(pomieszczenie_id, rodzaj, czas_trwania ) VALUES ($1, $2, $3)', [room, type, time], (error, results) => {
         if (error) {
@@ -285,7 +285,7 @@ const deleteSalary = (request, response) => {
      * CRUD for employees
      */
 const getEmployees = (request, response) => {
-    pool.query('SELECT * from pracownik_i_czas_pracy ORDER BY stanowisko', (error, results) => {
+    pool.query('SELECT * from pracownik_wszystko ORDER BY stanowisko', (error, results) => {
         if (error) {
             return response.status(400).render('pages/employees', { items: 0, result: "Nie można wypisać pracowników" })
         }
@@ -310,9 +310,9 @@ const createEmployee = (request, response) => {
     const { seance_name, salary, name, surname, workstand } = request.body
     pool.query('INSERT INTO pracownik(seans_id, wynagrodzenie_id, imie, nazwisko, stanowisko) VALUES (zwroc_id_seansu($1), zwroc_wynagrodzenie_id($2),$3, $4, $5);', [seance_name, salary, name, surname, workstand], (error, results) => {
         if (error) {
-            return response.status(400).send('Nie mozna dodac tego pracownika')
+            return response.status(400).render('pages/employees', { items: 0, result: "Nie można dodać pracownika" })
         }
-        response.status(201).send(`Pracownik dodany`)
+        return response.status(201).render('pages/employees', { items: 0, result: "Pracownik został dodany" })
     })
 }
 
@@ -427,12 +427,13 @@ const getCourseAndSeancesByCourseName = (request, response) => {
 }
 
 const createCourseAndSeance = (request, response) => {
-    const { course_name, seance_name, name, surname, workstand, salary } = request.body[0]
-    pool.query('INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id($1),zwroc_id_seansu($2),zwroc_id_pracownika($3, $4, $5,$6));', [course_name, seance_name, name, surname, workstand, salary], (error, results) => {
+    const { course_name, seance_name, employee_id } = request.body
+    pool.query('INSERT INTO kurs_seans(kurs_id, seans_id, pracownik_id) VALUES (zwroc_kurs_id($1),zwroc_id_seansu($2),$3);', [course_name, seance_name, employee_id], (error, results) => {
         if (error) {
-            return response.status(400).send('Pracownik pracuje za dlugo ')
+            return response.status(400).render('pages/courses', { items: 0, result: "Nie można dodać do kursu. Prawdopodobnie pracownik pracuje za długo" })
         }
-        response.status(201).send(`Seansu do kursu dodany`)
+        // response.status(201).send(`Seansu do kursu dodany`)
+        return response.status(201).render('pages/courses', { items: 0, result: "Seans został dodany do kursu" })
     })
 }
 
@@ -464,24 +465,34 @@ const deleteCourseAndSeance = (request, response) => {
  * CRUD for data
  */
 const getData = (request, response) => {
-    pool.query('SELECT * from przychody', (error, results) => {
+    pool.query('SELECT * from przychody ORDER BY dzien DESC', (error, results) => {
         if (error) {
-            return response.status(400).send(`Nie mozna wypisac wynagrodzenia`)
+            return response.status(400).render('pages/data', { items: 0, result: "Nie można wypisać terminarza" })
+        }
+        // response.status(200).json(results.rows)
+        return response.status(200).render('pages/data', { items: results.rows, result: "" })
+    })
+}
+const getDataByData = (request, response) => {
+    const id = request.params.id
+    pool.query(' select k.imie, k.nazwisko from klient k where k.klient_id IN (select zwroc_klientow_w_danym_dniu($1))', [id], (error, results) => {
+        if (error) {
+            return response.status(400).send(`Nie mozna wypisac klientow w tym dniu`)
         }
         response.status(200).json(results.rows)
     })
 }
-const getDataByData = (request, response) => {
-        const data = request.params.data
-        pool.query(' select k.imie, k.nazwisko from klient k where k.klient_id IN (select zwroc_klientow_w_danym_dniu(zwroc_data_id($1)))', [data], (error, results) => {
-            if (error) {
-                return response.status(400).send(`Nie mozna wypisac klientow w tym dniu`)
-            }
-            response.status(200).json(results.rows)
-        })
-    }
-    /*Nwm czy potrzeba getDataById */
-    /*Tak samo z updatem */
+
+const createData = (request, response) => {
+    const { data } = request.body
+    pool.query('INSERT INTO data(data) VALUES ($1)', [data], (error, results) => {
+        if (error) {
+            return response.status(400).render('pages/data', { items: 0, result: "Nie można dodać tej daty" })
+        }
+        // response.status(201).send(`Seansu do kursu dodany`)
+        return response.status(201).render('pages/data', { items: 0, result: "Data została dodana" })
+    })
+}
 
 const deleteData = (request, response) => {
     const data = request.params.data
@@ -500,18 +511,17 @@ const deleteData = (request, response) => {
 const getClients = (request, response) => {
         pool.query('SELECT * from klient', (error, results) => {
             if (error) {
-                return response.status(400).send(`Nie mozna wypisac klientow`)
+                return response.status(400).render('pages/clients', { items: 0, result: "Nie można wypisać klientów" })
             }
-            response.status(200).json(results.rows)
+            return response.status(200).render('pages/clients', { items: results.rows, result: "" })
         })
     }
     /**Z biegiem czasu mozna sprawdzicz , czy da sie wyszukiwac tylko po peselu zamiast po imieniu
      * i nazwisku, wtedy mozna zmienic trigger, by moglo byc dwoch takich samym imie i nazywsko
      */
 const getClientByNameAndSurname = (request, response) => {
-    const name = request.params.name
-    const surname = request.params.surname
-    pool.query('SELECT zwroc_dane_klienta($1, $2) as klient_kursy', [name, surname], (error, results) => {
+    const id = request.params.id
+    pool.query('SELECT zwroc_dane_klientaV2($1) as klient_kursy', [id], (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna wypisac klientow`)
         }
@@ -520,19 +530,18 @@ const getClientByNameAndSurname = (request, response) => {
 }
 
 const createClient = (request, response) => {
-        const { name, surname, pesel } = request.body[0]
+        const { name, surname, pesel } = request.body
         pool.query('INSERT INTO klient(imie, nazwisko, pesel) VALUES ($1, $2, $3)', [name, surname, pesel], (error, results) => {
             if (error) {
-                return response.status(400).send('Nie mozna dodac klienta do kursu')
+                return response.status(400).render('pages/clients', { items: 0, result: "Nie można dodać klienta" })
             }
-            response.status(201).send(`Klient dodany`)
+            return response.status(201).render('pages/clients', { items: 0, result: "Klient dodany" })
         })
     }
     /*Klientowi nie mozna updetowac danych */
 const deleteClient = (request, response) => {
-    const name = request.params.name
-    const surname = request.params.surname
-    pool.query('DELETE FROM klient WHERE imie = $1 and nazwisko = $2', [name, surname], (error, results) => {
+    const id = request.params.id
+    pool.query('DELETE FROM klient WHERE klient_id = $1 ', [id], (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna usunac tego klienta`)
         }
@@ -554,12 +563,13 @@ const getClientsAndCourses = (request, response) => {
 }
 
 const createClientAndCourse = (request, response) => {
-    const { name, surname, course_name, data } = request.body[0]
-    pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES (zwroc_klient_id($1, $2),zwroc_kurs_id($3),zwroc_data_id($4))', [name, surname, course_name, data], (error, results) => {
+    // const { name, surname, course_name, data } = request.body[0]
+    const { client_id, course_name, data } = request.body
+    pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES ($1,zwroc_kurs_id($2),zwroc_data_id($3))', [client_id, course_name, data], (error, results) => {
         if (error) {
-            return response.status(400).send('Nie mozna dodac klienta do kursu lub klientow jest wiecej niz 10 lub brakuje jakiejs rzeczy')
+            return response.status(400).render('pages/clients', { items: 0, result: "Nie można zapisać klienta" })
         }
-        response.status(201).send(`Klient zapisany na kurs`)
+        return response.status(201).render('pages/clients', { items: 0, result: "Klient zapisany na kurs" })
     })
 }
 
@@ -672,6 +682,7 @@ module.exports = {
     /*Datas */
     getData,
     getDataByData,
+    createData,
     deleteData,
 
     /*Clients */
