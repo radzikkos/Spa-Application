@@ -4,28 +4,28 @@
 <head>
     <%- include('../partials/head'); %>
         <script>
-            function addItem() {
-                document.getElementById("buttonToAdd1").style.display = "none";
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
-            const deleteCourse = (seand_id) => {
-                fetch('courses/' + seand_id, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                    .then(response => {
-                        response.json().then(json => {
-                            return json;
-                        })
-                    })
-                location.reload();
-            }
+            // function addItem() {
+            //     document.getElementById("buttonToAdd1").style.display = "none";
+            //     document.getElementById("extraInformationAboutSeance").style.display = "none";
+            //     document.getElementById("items").style.display = "none";
+            //     document.getElementById("itemsFormAdd").style.display = "inline";
+            //     document.getElementById("buttonToAdd").style.display = "none";
+            //     document.getElementById("result").style.display = "none";
+            // }
+            // const deleteCourse = (seand_id) => {
+            //     fetch('courses/' + seand_id, {
+            //             method: 'DELETE',
+            //             headers: {
+            //                 'Content-Type': 'application/json'
+            //             },
+            //         })
+            //         .then(response => {
+            //             response.json().then(json => {
+            //                 return json;
+            //             })
+            //         })
+            //     location.reload();
+            // }
 
             const moreInformation = (url, item) => {
                     fetch(url + '/' + item)
@@ -172,7 +172,7 @@
                                         </br>
                                         <button type="button" id="buttonToAdd" onclick="moreInformation('courses','<%= items[i].nazwa %>')">Szczegółowe informacje co kurs zawiera</button>
 
-                                        <button type="button" id="buttonToAdd" onclick="deleteCourse('<%= items[i].nazwa %>')">Usuń</button>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('courses','<%= items[i].nazwa %>')">Usuń</button>
 
                                     </div>
                                     <% } %>

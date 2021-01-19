@@ -3,28 +3,6 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <script>
-            function addItem() {
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
-            const deleteData = (url, id) => {
-                fetch(url + '/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                    .then(response => {
-                        response.json().then(json => {
-                            return json;
-                        })
-                    })
-                location.reload();
-            }
-        </script>
 </head>
 
 <body class="container">
@@ -34,10 +12,10 @@
     </header>
     <main>
         <div class="jumbotron">
-            <h1 class="Title">Rzeczy w magazynie</h1>
-            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj pomieszczenie</button>
+            <h1 class="Title">Pomieszczenia</h1>
+            <button type="button" id="buttonToAdd" onclick="addItemWithoutHidingExtra()">Dodaj pomieszczenie</button>
 
-
+            <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>
                 <div id="result">
                     <%= result %>

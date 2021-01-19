@@ -4,14 +4,6 @@
 <head>
     <%- include('../partials/head'); %>
         <script>
-            function addItem() {
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
-
             const moreInformation = (url, item) => {
                 fetch(url + '/' + item)
                     .then(response => {
@@ -42,7 +34,7 @@
     <main>
         <div class="jumbotron">
             <h1 class="Title">Terminarz</h1>
-            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj datę</button>
+            <button type="button" id="buttonToAdd" onclick="addItemWithoutHidingExtra()">Dodaj datę</button>
 
             <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>

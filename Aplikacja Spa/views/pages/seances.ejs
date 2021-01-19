@@ -4,61 +4,61 @@
 <head>
     <%- include('../partials/head'); %>
         <script>
-            function addItem() {
-                document.getElementById("buttonToAdd1").style.display = "none";
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("buttonToShow").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
+            // function addItem() {
+            //     document.getElementById("buttonToAdd1").style.display = "none";
+            //     document.getElementById("extraInformationAboutSeance").style.display = "none";
+            //     document.getElementById("items").style.display = "none";
+            //     document.getElementById("itemsFormAdd").style.display = "inline";
+            //     document.getElementById("buttonToAdd").style.display = "none";
+            //     document.getElementById("buttonToShow").style.display = "none";
+            //     document.getElementById("result").style.display = "none";
+            // }
 
-            const moreInformation = (item) => {
-                fetch('/seances/' + item)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw Error("ERRROR")
-                        }
-                        return response.json();
-                    })
-                    .then(responseData => {
-                        console.log(responseData)
-                        html = responseData.map(item => {
-                            return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Wykorzystana rzecz: </span><span class="output">${item.nazwa}</span></br><span class="outputTitle"> Wykorzystana ilość: </span><span class="output">${item.uzyta_ilosc}</span></br>`
-
-                        }).join("")
-                        document
-                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
-
-                    });
-            }
-            const deleteData = (url, id) => {
-                fetch(url + '/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                    .then(response => {
-                        response.json().then(json => {
-                            return json;
+            const moreInformation = (url, item) => {
+                    fetch(url + '/' + item)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw Error("ERRROR")
+                            }
+                            return response.json();
                         })
-                    })
-                location.reload();
-            }
+                        .then(responseData => {
+                            console.log(responseData)
+                            html = responseData.map(item => {
+                                return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Wykorzystana rzecz: </span><span class="output">${item.nazwa}</span></br><span class="outputTitle"> Wykorzystana ilość: </span><span class="output">${item.uzyta_ilosc}</span></br>`
 
-            function addItemToSeance() {
-                document.getElementById("buttonToAdd1").style.display = "none";
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsToSeanceAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("buttonToShow").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
+                            }).join("")
+                            document
+                                .querySelector("#extraInformationAboutSeance").innerHTML = html;
+
+                        });
+                }
+                // const deleteData = (url, id) => {
+                //     fetch(url + '/' + id, {
+                //             method: 'DELETE',
+                //             headers: {
+                //                 'Content-Type': 'application/json'
+                //             },
+                //         })
+                //         .then(response => {
+                //             response.json().then(json => {
+                //                 return json;
+                //             })
+                //         })
+                //     location.reload();
+                // }
+
+            // function addItemToSeance() {
+            //     document.getElementById("buttonToAdd1").style.display = "none";
+            //     document.getElementById("extraInformationAboutSeance").style.display = "none";
+            //     document.getElementById("items").style.display = "none";
+            //     document.getElementById("itemsToSeanceAdd").style.display = "inline";
+            //     document.getElementById("buttonToAdd").style.display = "none";
+            //     document.getElementById("buttonToShow").style.display = "none";
+            //     document.getElementById("result").style.display = "none";
+            // }
             const showEmployeesDoingSeance = (url, id) => {
-                fetch('/seanceEmployees/' + id)
+                fetch(url + '/' + id)
                     .then(response => {
                         if (!response.ok) {
                             document
@@ -215,9 +215,9 @@
                                                     <% } %>
                                         </span>
                                         </br>
-                                        <button type="button" id="buttonToAdd" onclick="moreInformation('<%= items[i].rodzaj %>')">Szczegółowe informacje</button>
-                                        <button type="button" id="buttonToAdd" onclick="deleteData('/courses','<%= items[i].seans_id %>')">Usuń</button>
-                                        <button type="button" id="buttonToAdd" onclick="showEmployeesDoingSeance('/seanceEmployees/','<%= items[i].rodzaj %>')">Wypisz pracowników robiących ten seans</button>
+                                        <button type="button" id="buttonToAdd" onclick="moreInformation('/seances','<%= items[i].rodzaj %>')">Szczegółowe informacje</button>
+                                        <button type="button" id="buttonToAdd" onclick="deleteData('/seances','<%= items[i].seans_id %>')">Usuń</button>
+                                        <button type="button" id="buttonToAdd" onclick="showEmployeesDoingSeance('/seanceEmployees','<%= items[i].rodzaj %>')">Wypisz pracowników robiących ten seans</button>
                                     </div>
                                     <% } %>
                             </ul>

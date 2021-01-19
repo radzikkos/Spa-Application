@@ -12,6 +12,7 @@ const pool = new Pool({
     /* 
     CRUD for items
 */
+
 const getItems = (request, response) => {
     pool.query('SELECT * FROM rzeczy_cena ORDER BY rzecz_id DESC', (error, results) => {
         if (error) {

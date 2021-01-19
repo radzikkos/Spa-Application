@@ -3,14 +3,6 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <script>
-            function addItem() {
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
-        </script>
 </head>
 
 <body class="container">
@@ -21,9 +13,9 @@
     <main>
         <div class="jumbotron">
             <h1 class="Title">Rzeczy w magazynie</h1>
-            <button type="button" id="buttonToAdd" onclick="addItem()">Dodaj do magazynu</button>
+            <button type="button" id="buttonToAdd" onclick="addItemWithoutHidingExtra()">Dodaj do magazynu</button>
 
-
+            <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>
                 <div id="result">
                     <%= result %>
@@ -106,5 +98,6 @@
     </footer>
 
 </body>
+<!-- <script type="text/javascript" src="javascrips/fun.js"></script> -->
 
 </html>

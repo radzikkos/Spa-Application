@@ -4,28 +4,6 @@
 <head>
     <%- include('../partials/head'); %>
         <script>
-            function addItem() {
-                document.getElementById("buttonToAdd1").style.display = "none";
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("itemsFormAdd").style.display = "inline";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("result").style.display = "none";
-            }
-            const deleteData = (url, id) => {
-                fetch(url + '/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                    .then(response => {
-                        response.json().then(json => {
-                            return json;
-                        })
-                    })
-                location.reload();
-            }
             const moreInformation = (url, item) => {
                 fetch(url + '/' + item)
                     .then(response => {
@@ -44,16 +22,6 @@
                             .querySelector("#extraInformationAboutSeance").innerHTML = html;
 
                     });
-            }
-
-            function addClientToCourse() {
-                document.getElementById("buttonToAdd1").style.display = "none";
-                document.getElementById("buttonToAdd").style.display = "none";
-                document.getElementById("extraInformationAboutSeance").style.display = "none";
-                document.getElementById("items").style.display = "none";
-                document.getElementById("clientToCourse").style.display = "inline";
-                document.getElementById("buttonToShow").style.display = "none";
-                document.getElementById("result").style.display = "none";
             }
         </script>
 </head>
