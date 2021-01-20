@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Rozpiska kursów i ich cen</h1>
+
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Kurs :</span>
+                                        <span class="output">
+                            <%= items[i].nazwa %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Łączna cena:</span>
+                                        <span class="output">
+                            <%= items[i].cena_za_calosc %>
+                                </span>
+                                        </br>
+
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+<!-- <script type="text/javascript" src="javascrips/fun.js"></script> -->
+
+</html>

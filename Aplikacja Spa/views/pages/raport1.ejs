@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Wszystkie kursy i ich seanse</h1>
+
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Kurs</span>
+                                        <span class="output">
+                            <%= items[i].kurs %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Seans w kursie:</span>
+                                        <span class="output">
+                            <%= items[i].seans_w_kursie %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Pracownik robiący dany seans:</span>
+                                        <span class="output">
+                                <%= items[i].pracownik %>
+                            </span>
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+<!-- <script type="text/javascript" src="javascrips/fun.js"></script> -->
+
+</html>

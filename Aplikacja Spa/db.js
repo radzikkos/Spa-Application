@@ -1,9 +1,9 @@
 const Pool = require('pg').Pool
 
 const pool = new Pool({
-    user: 'ibwbksua',
-    host: 'ziggy.db.elephantsql.com',
-    database: 'ibwbksua',
-    password: 'lyyCPZGsY_DRtnOYdRY8RdvbwxHf175w',
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
 })
 module.exports = pool;

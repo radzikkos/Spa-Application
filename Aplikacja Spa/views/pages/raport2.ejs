@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <div class="jumbotron">
+            <h1 class="Title">Wszyscy klienci i ich kursy</h1>
+
+            <div id="extraInformationAboutSeance"></div>
+            <% if (result) { %>
+                <div id="result">
+                    <%= result %>
+                </div>
+
+                <%} else { %>
+
+                    <% } %>
+
+
+                        <div>
+
+
+                            <ul id="items">
+                                <% for(var i = 0; i < items.length; i++) {%>
+                                    <div class="outputBoxes">
+
+                                        <span class="outputTitle">Klient</span>
+                                        <span class="output">
+                            <%= items[i].klient %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Kurs:</span>
+                                        <span class="output">
+                            <%= items[i].kurs %>
+                                </span>
+                                        </br>
+                                        <span class="outputTitle">Termin:</span>
+                                        <span class="output">
+                                <%= items[i].data %>
+                            </span>
+                                    </div>
+                                    <% } %>
+                            </ul>
+                        </div>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+<!-- <script type="text/javascript" src="javascrips/fun.js"></script> -->
+
+</html>
