@@ -217,7 +217,7 @@
                                         </br>
                                         <button type="button" id="buttonToAdd" onclick="moreInformation('/seances','<%= items[i].rodzaj %>')">Szczegółowe informacje</button>
                                         <button type="button" id="buttonToAdd" onclick="deleteData('/seances','<%= items[i].seans_id %>')">Usuń</button>
-                                        <button type="button" id="buttonToAdd" onclick="showEmployeesDoingSeance('/seanceEmployees','<%= items[i].rodzaj %>')">Wypisz pracowników robiących ten seans</button>
+                                        <button type="button" id="buttonToAdd" onclick="showEmployeesDoingSeance('/seances/seanceEmployees','<%= items[i].rodzaj %>')">Wypisz pracowników robiących ten seans</button>
                                     </div>
                                     <% } %>
                             </ul>
