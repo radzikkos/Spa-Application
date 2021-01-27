@@ -48,9 +48,6 @@ app.use('/clients', clientsRouter)
 app.use('/clientsAndCourses', clientsAndCourses)
 app.use('/raports', raportsRouter)
 
-/*Dopisać raport wszystkich klientów i kursów wraz z datami */
-// app.get('/clientsAndCourses', db.getClientsAndCourses)
-
 app.use((req, res, next) => {
     res.status(404).send({
         status: 404,

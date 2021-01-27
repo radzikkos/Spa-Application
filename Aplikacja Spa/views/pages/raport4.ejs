@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <%- include('../partials/head'); %>
         <style>
             .Title {
@@ -37,7 +36,6 @@
                 margin: 0;
             }
         </style>
-
 </head>
 
 <body class="container">
@@ -47,7 +45,7 @@
     </header>
     <main>
         <div class="jumbotron">
-            <h1 class="Title">Wszystkie kursy i ich seanse</h1>
+            <h1 class="Title">Klient i kursy przez niego zamówione</h1>
 
             <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>
@@ -67,20 +65,17 @@
                                 <% for(var i = 0; i < items.length; i++) {%>
                                     <div class="outputBoxes">
 
-                                        <span class="outputTitle">Kurs</span>
+                                        <span class="outputTitle">Ilość wykupionych kursów :</span>
                                         <span class="output">
-                            <%= items[i].kurs %>
+                            <%= items[i].count %>
                                 </span>
                                         </br>
-                                        <span class="outputTitle">Seans w kursie:</span>
+                                        <span class="outputTitle">Klient:</span>
                                         <span class="output">
-                            <%= items[i].seans_w_kursie %>
+                            <%= items[i].imie %> <%= items[i].nazwisko %>
                                 </span>
                                         </br>
-                                        <span class="outputTitle">Pracownik robiący dany seans:</span>
-                                        <span class="output">
-                                <%= items[i].pracownik %>
-                            </span>
+
                                     </div>
                                     <% } %>
                             </ul>

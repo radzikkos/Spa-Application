@@ -4,59 +4,26 @@
 <head>
     <%- include('../partials/head'); %>
         <script>
-            // function addItem() {
-            //     document.getElementById("buttonToAdd1").style.display = "none";
-            //     document.getElementById("extraInformationAboutSeance").style.display = "none";
-            //     document.getElementById("items").style.display = "none";
-            //     document.getElementById("itemsFormAdd").style.display = "inline";
-            //     document.getElementById("buttonToAdd").style.display = "none";
-            //     document.getElementById("buttonToShow").style.display = "none";
-            //     document.getElementById("result").style.display = "none";
-            // }
-
             const moreInformation = (url, item) => {
-                    fetch(url + '/' + item)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw Error("ERRROR")
-                            }
-                            return response.json();
-                        })
-                        .then(responseData => {
-                            console.log(responseData)
-                            html = responseData.map(item => {
-                                return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Wykorzystana rzecz: </span><span class="output">${item.nazwa}</span></br><span class="outputTitle"> Wykorzystana ilość: </span><span class="output">${item.uzyta_ilosc}</span></br>`
+                fetch(url + '/' + item)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw Error("ERRROR")
+                        }
+                        return response.json();
+                    })
+                    .then(responseData => {
+                        console.log(responseData)
+                        html = responseData.map(item => {
+                            return `<span class="outputTitle">Dodatkowe informacje o seansie</span></br><span class="outputTitle">Wykorzystana rzecz: </span><span class="output">${item.nazwa}</span></br><span class="outputTitle"> Wykorzystana ilość: </span><span class="output">${item.uzyta_ilosc}</span></br>`
 
-                            }).join("")
-                            document
-                                .querySelector("#extraInformationAboutSeance").innerHTML = html;
+                        }).join("")
+                        document
+                            .querySelector("#extraInformationAboutSeance").innerHTML = html;
 
-                        });
-                }
-                // const deleteData = (url, id) => {
-                //     fetch(url + '/' + id, {
-                //             method: 'DELETE',
-                //             headers: {
-                //                 'Content-Type': 'application/json'
-                //             },
-                //         })
-                //         .then(response => {
-                //             response.json().then(json => {
-                //                 return json;
-                //             })
-                //         })
-                //     location.reload();
-                // }
+                    });
+            }
 
-            // function addItemToSeance() {
-            //     document.getElementById("buttonToAdd1").style.display = "none";
-            //     document.getElementById("extraInformationAboutSeance").style.display = "none";
-            //     document.getElementById("items").style.display = "none";
-            //     document.getElementById("itemsToSeanceAdd").style.display = "inline";
-            //     document.getElementById("buttonToAdd").style.display = "none";
-            //     document.getElementById("buttonToShow").style.display = "none";
-            //     document.getElementById("result").style.display = "none";
-            // }
             const showEmployeesDoingSeance = (url, id) => {
                 fetch(url + '/' + id)
                     .then(response => {
@@ -109,7 +76,18 @@
                                             <label for="room">Pokój nr </label>
                                         </td>
                                         <td>
-                                            <input type="number" id="room" name="room" size="20" placeholder="Wprowadź nr pokoju" required><br>
+                                            <!-- <input type="number" id="room" name="room" size="20" placeholder="Wprowadź nr pokoju" required><br> -->
+                                            <select id="room" name="room">
+                                                <% if(typeof rooms != 'undefined') {%>
+                                                    <% for(var i = 0; i < rooms.length; i++) {%>
+
+                                                        <option value=<%= rooms[i].pomieszczenie_id %>> <%= rooms[i].pomieszczenie_id%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
 
                                     </tr>
@@ -129,7 +107,7 @@
                                             <label for="time">Czas trwania </label>
                                         </td>
                                         <td>
-                                            <input type="number" id="time" name="time" min="0" placeholder="Wprowadź czas trwania" required><br>
+                                            <input type="number" id="time" name="time" min="0" max="100" placeholder="Wprowadź czas trwania" required><br>
                                         </td>
 
                                     </tr>
@@ -150,7 +128,18 @@
                                             <label for="item">Nazwa rzeczy </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="item_name" name="item_name" size="20" placeholder="Wprowadź nazwę rzeczy" required><br>
+                                            <!-- <input type="text" id="item_name" name="item_name" size="20" placeholder="Wprowadź nazwę rzeczy" required><br> -->
+                                            <select id="item_name" name="item_name">
+                                                <% if(typeof item != 'undefined') {%>
+                                                    <% for(var i = 0; i < item.length; i++) {%>
+
+                                                        <option value=<%= item[i].rzecz_id %>> <%= item[i].nazwa%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
 
                                     </tr>
@@ -160,7 +149,18 @@
                                             <label for="seance">Rodzaj seansu </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="seance_name" name="seance_name" size="20" placeholder="Wprowadź nazwę seansu" required><br>
+                                            <!-- <input type="text" id="seance_name" name="seance_name" size="20" placeholder="Wprowadź nazwę seansu" required><br> -->
+                                            <select id="seance_name" name="seance_name">
+                                                <% if(typeof seance != 'undefined') {%>
+                                                    <% for(var i = 0; i < seance.length; i++) {%>
+
+                                                        <option value=<%= seance[i].seans_id %>> <%= seance[i].rodzaj%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
                                     </tr>
                                     <tr>

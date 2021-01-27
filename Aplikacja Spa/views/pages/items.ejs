@@ -3,6 +3,25 @@
 
 <head>
     <%- include('../partials/head'); %>
+        <script>
+            function updateData(url, id) {
+                fetch(url + '/' + id, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: 100
+                        })
+                    })
+                    .then(response => {
+                        response.json().then(json => {
+                            return json;
+                        })
+                    })
+                location.reload();
+            }
+        </script>
 </head>
 
 <body class="container">
@@ -86,6 +105,10 @@
                                         <span class="output">
                                 <%= items[i].cena_pojedynczej_sztuki %>
                             </span>
+                                        </br>
+                                        <div id="boxForButton">
+                                            <button type="button" id="buttonToAdd" onclick="updateData('items','<%= items[i].nazwa %>')">Zwiększ ilość o 100</button>
+                                        </div>
                                     </div>
                                     <% } %>
                             </ul>

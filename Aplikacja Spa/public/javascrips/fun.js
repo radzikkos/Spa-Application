@@ -19,6 +19,7 @@ function addItemWithoutHidingExtra() {
 }
 
 function deleteData(url, id) {
+
     fetch(url + '/' + id, {
             method: 'DELETE',
             headers: {
@@ -26,11 +27,20 @@ function deleteData(url, id) {
             },
         })
         .then(response => {
+            console.log(response.status);
+            if (!response.ok) {
+                document.getElementById("extraInformationAboutSeance").innerHTML = "Nie udało się usunąć. Rekord ma jakieś powiązania";
+                console.log("Nie usunieto")
+            } else {
+                document.getElementById("extraInformationAboutSeance").innerHTML = "Usunięto z bazy - odśwież stronę";
+            }
             response.json().then(json => {
-                return json;
-            })
+                    return json;
+                })
+                .catch(function(err) {
+                    console.log(err);
+                })
         })
-    location.reload();
 }
 
 function addItemToSeance() {

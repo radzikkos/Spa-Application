@@ -26,9 +26,9 @@ const createItem = (request, response) => {
 
 const updateItem = (request, response) => {
     const name = request.params.name
-    const { price, amount } = request.body[0]
+    const { amount } = request.body
 
-    pool.query('UPDATE rzecz SET cena_id = zwroc_id_ceny($1), ilosc = (ilosc + $2) WHERE nazwa = $3', [price, amount, name], (error, results) => {
+    pool.query('UPDATE rzecz SET ilosc = (ilosc + $1) WHERE nazwa = $2', [amount, name], (error, results) => {
         if (error) {
             return response.status(400).send(`Nie mozna zmodyfikowac ${name}`)
         }

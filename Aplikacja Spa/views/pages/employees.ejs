@@ -62,7 +62,18 @@
                                             <label for="seance_name">Seans jakim się zajmuje </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="seance_name" name="seance_name" placeholder="Seans" required><br>
+                                            <!-- <input type="text" id="seance_name" name="seance_name" placeholder="Seans" required><br> -->
+                                            <select id="seance_name" name="seance_name">
+                                                <% if(typeof seance != 'undefined') {%>
+                                                    <% for(var i = 0; i < seance.length; i++) {%>
+
+                                                        <option value=<%= seance[i].seans_id %>> <%= seance[i].rodzaj%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
                                     </tr>
                                     <tr>
@@ -70,7 +81,16 @@
                                             <label for="salary">Wynagrodzenie </label>
                                         </td>
                                         <td>
-                                            <input type="number" id="salary" name="salary" placeholder="Wynagrodzenie" required><br>
+                                            <!-- <input type="number" id="salary" name="salary" placeholder="Wynagrodzenie" required><br> -->
+                                            <select id="salary" name="salary">
+                                                <% if(typeof salary != 'undefined') {%>
+                                                <% for(var i = 0; i < salary.length; i++) {%>
+
+                                                    <option value=<%= salary[i].kwota  %>> <%= salary[i].kwota %></option>
+                                            
+                                                <% } %>
+                                                <% } %>
+                                              </select>
                                         </td>
                                     </tr>
                                     <tr>

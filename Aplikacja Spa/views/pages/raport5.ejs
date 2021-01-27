@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <%- include('../partials/head'); %>
 </head>
 
@@ -10,6 +11,10 @@
     <header>
         <%- include('../partials/header'); %>
             <style>
+                .Title {
+                    text-align: center;
+                }
+                
                 .outputBoxes {
                     margin-bottom: 10px;
                     border-color: rgba(82, 168, 236, 0.8);
@@ -37,15 +42,11 @@
                     line-height: 48px;
                     margin: 0;
                 }
-                
-                .Title {
-                    text-align: center;
-                }
             </style>
     </header>
     <main>
         <div class="jumbotron">
-            <h1 class="Title">Wszyscy klienci i ich kursy</h1>
+            <h1 class="Title">Liczba sprzedanych kursow</h1>
 
             <div id="extraInformationAboutSeance"></div>
             <% if (result) { %>
@@ -65,20 +66,17 @@
                                 <% for(var i = 0; i < items.length; i++) {%>
                                     <div class="outputBoxes">
 
-                                        <span class="outputTitle">Klient</span>
+                                        <span class="outputTitle">Nazwa kursu :</span>
                                         <span class="output">
-                            <%= items[i].klient %>
+                            <%= items[i].nazwa %>
                                 </span>
                                         </br>
-                                        <span class="outputTitle">Kurs:</span>
+                                        <span class="outputTitle">Liczba sprzedanych kursów</span>
                                         <span class="output">
-                            <%= items[i].kurs %>
+                            <%= items[i].count %>
                                 </span>
                                         </br>
-                                        <span class="outputTitle">Termin:</span>
-                                        <span class="output">
-                                <%= items[i].data %>
-                            </span>
+
                                     </div>
                                     <% } %>
                             </ul>

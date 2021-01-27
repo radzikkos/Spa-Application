@@ -57,7 +57,18 @@
                                             <label for="client_id">Id Klienta : </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="client_id" name="client_id" placeholder="Id klienta" required><br>
+                                            <!-- <input type="text" id="client_id" name="client_id" placeholder="Id klienta" required><br> -->
+                                            <select id="client_id" name="client_id">
+                                                <% if(typeof c != 'undefined') {%>
+                                                    <% for(var i = 0; i < c.length; i++) {%>
+
+                                                        <option value=<%= c[i].klient_id %>> <%= c[i].imie%>  <%= c[i].nazwisko%> </option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
 
                                     </tr>
@@ -66,7 +77,18 @@
                                             <label for="course_name">Podaj nazwę kursu : </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="course_name" name="course_name" placeholder="Nazwa kursu" required><br>
+                                            <!-- <input type="text" id="course_name" name="course_name" placeholder="Nazwa kursu" required><br> -->
+                                            <select id="course_name" name="course_name">
+                                                <% if(typeof courses != 'undefined') {%>
+                                                    <% for(var i = 0; i < courses.length; i++) {%>
+
+                                                        <option value=<%= courses[i].kurs_id %>> <%= courses[i].nazwa%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
 
                                     </tr>
@@ -75,7 +97,18 @@
                                             <label for="data">Termin : </label>
                                         </td>
                                         <td>
-                                            <input type="text" id="data" name="data" placeholder="dd-mm-rr" required><br>
+                                            <!-- <input type="text" id="data" name="data" placeholder="dd-mm-rr" required><br> -->
+                                            <select id="data" name="data">
+                                                <% if(typeof data != 'undefined') {%>
+                                                    <% for(var i = 0; i < data.length; i++) {%>
+
+                                                        <option value=<%= data[i].data %>> <%= data[i].data%></option>
+                                                
+                                                    <% } %>
+                                                <% } %>
+                                                
+                                                
+                                              </select>
                                         </td>
 
                                     </tr>

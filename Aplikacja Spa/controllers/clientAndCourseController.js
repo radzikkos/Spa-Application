@@ -11,7 +11,7 @@ const getClientsAndCourses = (request, response) => {
 
 const createClientAndCourse = (request, response) => {
     const { client_id, course_name, data } = request.body
-    pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES ($1,zwroc_kurs_id($2),zwroc_data_id($3))', [client_id, course_name, data], (error, results) => {
+    pool.query('INSERT INTO klient_kurs(klient_id, kurs_id, data_id) VALUES ($1,$2,zwroc_data_id($3))', [client_id, course_name, data], (error, results) => {
         if (error) {
             return response.status(400).render('pages/clients', { items: 0, result: "Nie można zapisać klienta" })
         }

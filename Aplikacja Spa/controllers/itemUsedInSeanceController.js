@@ -11,7 +11,7 @@ const getItemUsedInSeance = (request, response) => {
 
 const createItemUsedInSeance = (request, response) => {
     const { seance_name, item_name, amount } = request.body
-    pool.query('INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES (zwroc_id_seansu($1),zwroc_rzecz_id($2),$3);', [seance_name, item_name, amount], (error, results) => {
+    pool.query('INSERT INTO rzeczy_wykorzystane_do_seansu(seans_id, rzecz_id, uzyta_ilosc) VALUES ($1,($2),$3);', [seance_name, item_name, amount], (error, results) => {
         if (error) {
             return response.status(400).render('pages/seances', { items: 0, result: "Nie można dodać rzeczy do tego seansu" })
 

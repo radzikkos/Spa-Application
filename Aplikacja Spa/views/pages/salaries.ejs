@@ -57,7 +57,9 @@
                                         <span class="output">
                                         <%= items[i].kwota %>
                                         </span>
-                                        <button type="button" id="buttonToAdd" onclick="deleteData('salaries','<%= items[i].kwota %>')">Usuń</button>
+                                        <div id="boxForButton">
+                                            <button type="button" id="buttonToAdd" onclick="deleteData('salaries','<%= items[i].kwota %>')">Usuń</button>
+                                        </div>
 
                                     </div>
                                     <% } %>
